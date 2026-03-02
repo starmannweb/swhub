@@ -1,1 +1,0 @@
-.next/types/validator.ts(53,39): error TS2307: Cannot find module '../../src/app/(builder)/sites/[id]/editor/page.js' or its corresponding type declarations.
