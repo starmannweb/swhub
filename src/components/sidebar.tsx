@@ -154,24 +154,24 @@ export function Sidebar() {
 
     return (
         <aside className={cn(
-            "hidden md:flex h-screen flex-col bg-[#1a1a1a] overflow-y-auto transition-all duration-300 ease-in-out z-40 border-r border-white/5",
+            "hidden md:flex h-screen flex-col bg-[#0d0f1a] overflow-y-auto transition-all duration-300 ease-in-out z-40 border-r border-white/[0.06]",
             isCollapsed ? "w-[72px]" : "w-64"
         )}>
-            {/* Header - User Greeting & Toggle */}
-            <div className="flex shrink-0 items-center justify-between px-4 py-5 sticky top-0 bg-[#1a1a1a] z-10">
+            {/* Header - Logo & Toggle */}
+            <div className="flex shrink-0 items-center justify-between px-4 py-5 sticky top-0 bg-[#0d0f1a] z-10">
                 <div className={cn("flex items-center gap-3 overflow-hidden", isCollapsed && "w-0 opacity-0")}>
-                    <div className="flex shrink-0 h-9 w-9 items-center justify-center rounded-full bg-emerald-600">
-                        <span className="text-sm font-bold text-white">H</span>
+                    <div className="flex shrink-0 h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 shadow-lg shadow-violet-900/30">
+                        <span className="text-sm font-bold text-white">S</span>
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[11px] uppercase tracking-widest text-gray-500 font-medium">Olá</p>
-                        <p className="text-sm font-semibold text-white truncate">SWHub</p>
+                        <p className="text-sm font-bold text-white truncate tracking-wide">SWHub</p>
+                        <p className="text-[10px] text-gray-500 font-medium">v0.5.0</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
                     className={cn(
-                        "p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors shrink-0",
+                        "p-1.5 rounded-md hover:bg-white/10 text-gray-500 hover:text-white transition-colors shrink-0",
                         isCollapsed && "mx-auto"
                     )}
                     title={isCollapsed ? "Expandir" : "Recolher"}
@@ -197,10 +197,10 @@ export function Sidebar() {
                                         }}
                                         title={isCollapsed ? section.title : undefined}
                                         className={cn(
-                                            "flex items-center w-full rounded-lg transition-colors",
+                                            "flex items-center w-full rounded-xl transition-colors",
                                             active
-                                                ? "text-emerald-400"
-                                                : "text-gray-400 hover:bg-white/5 hover:text-gray-200",
+                                                ? "text-violet-400"
+                                                : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200",
                                             isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                         )}
                                     >
@@ -209,7 +209,7 @@ export function Sidebar() {
                                             <>
                                                 <span className="flex-1 text-left whitespace-nowrap">{section.title}</span>
                                                 <ChevronDown className={cn(
-                                                    "h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500",
+                                                    "h-4 w-4 shrink-0 transition-transform duration-200 text-gray-600",
                                                     isExpanded && "rotate-180"
                                                 )} />
                                             </>
@@ -217,7 +217,7 @@ export function Sidebar() {
                                     </button>
 
                                     {!isCollapsed && isExpanded && (
-                                        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
+                                        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-violet-500/10 pl-3">
                                             {section.items!.map((item) => {
                                                 const itemActive = isItemActive(item.href)
                                                 return (
@@ -227,8 +227,8 @@ export function Sidebar() {
                                                         className={cn(
                                                             "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
                                                             itemActive
-                                                                ? "text-emerald-400 bg-emerald-500/10"
-                                                                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                                                                ? "text-white bg-violet-600/20"
+                                                                : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.04]"
                                                         )}
                                                     >
                                                         <item.icon className="h-4 w-4 shrink-0" />
@@ -248,14 +248,14 @@ export function Sidebar() {
                                 href={section.href!}
                                 title={isCollapsed ? section.title : undefined}
                                 className={cn(
-                                    "flex items-center rounded-lg transition-colors",
+                                    "flex items-center rounded-xl transition-colors",
                                     active
-                                        ? "text-emerald-400 bg-emerald-500/10"
-                                        : "text-gray-400 hover:bg-white/5 hover:text-gray-200",
+                                        ? "text-white bg-gradient-to-r from-violet-600/30 to-violet-700/10 shadow-sm"
+                                        : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200",
                                     isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                 )}
                             >
-                                <section.icon className="h-[18px] w-[18px] shrink-0" />
+                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-400")} />
                                 {!isCollapsed && <span className="whitespace-nowrap">{section.title}</span>}
                             </Link>
                         )
@@ -264,14 +264,14 @@ export function Sidebar() {
             </nav>
 
             {/* Footer */}
-            <div className="border-t border-white/5 p-4 shrink-0 mt-auto sticky bottom-0 bg-[#1a1a1a] overflow-hidden">
+            <div className="border-t border-white/[0.06] p-4 shrink-0 mt-auto sticky bottom-0 bg-[#0d0f1a] overflow-hidden">
                 {!isCollapsed ? (
                     <p className="text-[11px] text-gray-600 text-center whitespace-nowrap">
-                        SWHub v0.4.0
+                        SWHub v0.5.0
                     </p>
                 ) : (
                     <div className="w-full flex justify-center">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
+                        <div className="w-2 h-2 rounded-full bg-violet-500/50"></div>
                     </div>
                 )}
             </div>

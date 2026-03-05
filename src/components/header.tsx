@@ -42,15 +42,11 @@ export function Header({ userEmail, userName }: HeaderProps) {
             : "U"
 
     return (
-        <header className="flex h-16 items-center justify-between border-b border-white/5 bg-[#161616] px-6">
-            <div>
-                <h2 className="text-lg font-semibold">
-                    Olá{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
-                </h2>
-            </div>
+        <header className="flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0f1a] px-6">
+            <div />
 
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-white hover:bg-white/[0.06]">
                     <Bell className="h-4 w-4" />
                 </Button>
 
@@ -63,7 +59,7 @@ export function Header({ userEmail, userName }: HeaderProps) {
                             className="relative h-9 w-9 rounded-full"
                         >
                             <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                                <AvatarFallback className="bg-violet-600 text-white text-sm">
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>

@@ -23,7 +23,7 @@ export default async function DashboardLayout({
                     userEmail={user.email}
                     userName={user.user_metadata?.full_name}
                 />
-                <main className="flex-1 overflow-y-auto bg-[#111] p-6">
+                <main className="flex-1 overflow-y-auto bg-[#0a0c16] p-6">
                     {children}
                 </main>
             </div>
