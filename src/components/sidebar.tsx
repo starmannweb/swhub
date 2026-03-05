@@ -26,6 +26,7 @@ import {
     Headset,
     Download,
     ShieldCheck,
+    GlobeLock,
     type LucideIcon,
 } from "lucide-react"
 
@@ -49,18 +50,18 @@ const navigation: NavSection[] = [
         href: "/",
     },
     {
-        title: "Leads",
-        icon: Users,
-        href: "/crm/contatos",
-    },
-    {
         title: "CRM",
         icon: KanbanSquare,
         items: [
-            { title: "Negócios", href: "/crm/negocios", icon: KanbanSquare },
-            { title: "Propostas", href: "/financeiro/propostas", icon: FileText },
-            { title: "Gestão de Tarefas", href: "/colaboracao/tarefas", icon: CheckSquare },
+            { title: "Leads", href: "/crm/contatos", icon: Users },
+            { title: "Pipeline", href: "/crm/negocios", icon: KanbanSquare },
+            { title: "Propostas", href: "/crm/propostas", icon: FileText },
         ],
+    },
+    {
+        title: "Tarefas",
+        icon: CheckSquare,
+        href: "/colaboracao/tarefas",
     },
     {
         title: "Projetos",
@@ -68,12 +69,14 @@ const navigation: NavSection[] = [
         href: "/colaboracao/projetos",
     },
     {
-        title: "Construtor de Sites",
+        title: "Criar Site",
         icon: Globe,
-        items: [
-            { title: "Editor Moderno", href: "/sites", icon: Globe },
-            { title: "Editor Clássico", href: "/sites-beta", icon: LayoutTemplate },
-        ],
+        href: "/sites",
+    },
+    {
+        title: "Domínios",
+        icon: GlobeLock,
+        href: "/dominios",
     },
     {
         title: "Automações",

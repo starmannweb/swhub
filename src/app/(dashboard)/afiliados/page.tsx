@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
     Users, Clock, ShieldCheck, ShieldAlert,
-    Copy, Share2, Mail, Megaphone, CheckCircle2
+    Copy, Share2, Mail, Megaphone, CheckCircle2, Star
 } from "lucide-react"
 
 export default function AffiliatesDashboard() {
@@ -15,6 +15,9 @@ export default function AffiliatesDashboard() {
     const [copied, setCopied] = useState(false)
     const [promoterData, setPromoterData] = useState<any>(null)
     const [indications, setIndications] = useState<any[]>([])
+    const [npsScore, setNpsScore] = useState<number | null>(null)
+    const [npsComment, setNpsComment] = useState("")
+    const [npsSubmitted, setNpsSubmitted] = useState(false)
 
     // Parametrização estática temporária
     const referralCode = promoterData?.referral_code || "HUB12345"
@@ -186,6 +189,72 @@ export default function AffiliatesDashboard() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* NPS Section */}
+            <Card className="border shadow-sm">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Star className="h-5 w-5 text-amber-400" /> Avaliação NPS
+                    </CardTitle>
+                    <CardDescription>
+                        Qual a probabilidade de você recomendar nosso serviço? Sua avaliação nos ajuda a melhorar.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                        {Array.from({ length: 11 }, (_, i) => i).map((score) => (
+                            <button
+                                key={score}
+                                onClick={() => {
+                                    setNpsScore(score)
+                                    setNpsSubmitted(false)
+                                }}
+                                className={`w-11 h-11 rounded-lg text-sm font-bold transition-all border ${
+                                    npsScore === score
+                                        ? score <= 6
+                                            ? "bg-red-500 text-white border-red-500 scale-110"
+                                            : score <= 8
+                                                ? "bg-amber-500 text-white border-amber-500 scale-110"
+                                                : "bg-emerald-500 text-white border-emerald-500 scale-110"
+                                        : "bg-muted/40 text-muted-foreground border-border hover:bg-muted hover:scale-105"
+                                }`}
+                            >
+                                {score}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground px-1">
+                        <span>Nada provável</span>
+                        <span>Muito provável</span>
+                    </div>
+                    {npsScore !== null && !npsSubmitted && (
+                        <div className="space-y-3 pt-2">
+                            <Input
+                                placeholder="Algum comentário? (opcional)"
+                                value={npsComment}
+                                onChange={(e) => setNpsComment(e.target.value)}
+                                className="bg-muted/40"
+                            />
+                            <Button
+                                onClick={() => {
+                                    setNpsSubmitted(true)
+                                }}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                Enviar Avaliação
+                            </Button>
+                        </div>
+                    )}
+                    {npsSubmitted && (
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                                Obrigado pela sua avaliação! Nota: {npsScore}
+                            </p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     )
 }
