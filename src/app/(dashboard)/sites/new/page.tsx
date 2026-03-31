@@ -184,6 +184,23 @@ export default function NewSitePage() {
                 throw insertError
             }
 
+            // Create the initial home page automatically
+            const { data: pageData, error: pageError } = await supabase
+                .from("site_pages")
+                .insert({
+                    site_id: data.id,
+                    name: "Página Inicial",
+                    slug: "home",
+                    is_home: true
+                })
+                .select("id")
+                .single()
+
+            if (pageError) {
+                console.error("Error creating home page:", pageError)
+                throw new Error("Erro ao criar página inicial do site.")
+            }
+
             // Save selected template to localStorage so the editor can pick it up
             if (selectedTemplate && selectedTemplate !== "blank") {
                 const tpl = TEMPLATES.find(t => t.id === selectedTemplate)
@@ -196,7 +213,7 @@ export default function NewSitePage() {
                 }
             }
 
-            router.push(`/sites/${data.id}/editor`)
+            router.push(`/sites/${data.id}/pages/${pageData.id}/editor`)
         } catch (err: unknown) {
             console.error("Erro ao criar site:", err)
             if (err instanceof Error) {
