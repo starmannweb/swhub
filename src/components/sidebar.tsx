@@ -41,6 +41,7 @@ interface NavSection {
     icon: LucideIcon
     href?: string
     items?: NavItem[]
+    adminOnly?: boolean
 }
 
 const navigation: NavSection[] = [
@@ -65,14 +66,12 @@ const navigation: NavSection[] = [
         href: "/crm/propostas",
     },
     {
-        title: "Tarefas",
-        icon: CheckSquare,
-        href: "/colaboracao/tarefas",
-    },
-    {
         title: "Projetos",
         icon: Briefcase,
-        href: "/colaboracao/projetos",
+        items: [
+            { title: "Painel de Projetos", href: "/colaboracao/projetos", icon: Briefcase },
+            { title: "Tarefas", href: "/colaboracao/tarefas", icon: CheckSquare },
+        ],
     },
     {
         title: "Criar Site",
@@ -122,6 +121,7 @@ const navigation: NavSection[] = [
     {
         title: "Admin",
         icon: ShieldCheck,
+        adminOnly: true,
         items: [
             { title: "Painel Admin", href: "/admin", icon: ShieldCheck },
             { title: "Modelos de Sites", href: "/admin/modelos", icon: LayoutTemplate },
@@ -135,10 +135,10 @@ const navigation: NavSection[] = [
     },
 ]
 
-export function Sidebar() {
+export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
     const pathname = usePathname()
     const [isCollapsed, setIsCollapsed] = useState(false)
-    const [expandedSections, setExpandedSections] = useState<string[]>(["CRM"])
+    const [expandedSections, setExpandedSections] = useState<string[]>(["CRM", "Admin"])
 
     const toggleSection = (title: string) => {
         setExpandedSections((prev) =>
@@ -185,7 +185,7 @@ export function Sidebar() {
             {/* Navigation */}
             <nav className={cn("flex-1 py-2", isCollapsed ? "px-2" : "px-3")}>
                 <div className="space-y-0.5">
-                    {navigation.map((section) => {
+                    {navigation.filter(section => !section.adminOnly || isAdmin).map((section) => {
                         const active = isSectionActive(section)
                         const isExpanded = expandedSections.includes(section.title)
                         const hasItems = section.items && section.items.length > 0

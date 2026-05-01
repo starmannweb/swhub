@@ -15,9 +15,17 @@ export default async function DashboardLayout({
         redirect("/login")
     }
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin, role')
+        .eq('id', user.id)
+        .single()
+        
+    const isAdmin = profile?.is_admin === true || profile?.role === 'admin'
+
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
+            <Sidebar isAdmin={isAdmin} />
             <div className="flex flex-1 flex-col overflow-hidden">
                 <Header
                     userEmail={user.email}

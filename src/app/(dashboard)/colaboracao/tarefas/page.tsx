@@ -110,9 +110,9 @@ export default function TarefasPage() {
                 </div>
             </div>
 
-            <Card className="border-t-4 border-t-primary shadow-sm overflow-hidden">
-                <CardHeader className="bg-muted/20 border-b p-4">
-                    <div className="grid grid-cols-12 gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider items-center">
+            <Card className="border-t-4 border-t-violet-500 shadow-sm overflow-hidden bg-[#12142a] border border-white/[0.06]">
+                <CardHeader className="bg-white/[0.02] border-b border-white/[0.06] p-4">
+                    <div className="grid grid-cols-12 gap-4 text-xs font-semibold text-gray-400 uppercase tracking-wider items-center">
                         <div className="col-span-6 md:col-span-5 flex items-center gap-2">
                             <span>Status</span> <span className="ml-4">Título da Tarefa</span>
                         </div>
@@ -121,7 +121,7 @@ export default function TarefasPage() {
                         <div className="col-span-3 md:col-span-2 flex justify-end">Prioridade</div>
                     </div>
                 </CardHeader>
-                <CardContent className="p-0 divide-y flex-1 min-h-[300px] relative">
+                <CardContent className="p-0 divide-y divide-white/[0.06] flex-1 min-h-[300px] relative">
                     {loading ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -132,11 +132,11 @@ export default function TarefasPage() {
                         </div>
                     ) : (
                         filteredTarefas.map(tarefa => (
-                            <div key={tarefa.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/30 transition-colors group">
+                            <div key={tarefa.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/[0.02] transition-colors group">
                                 <div className="col-span-6 md:col-span-5 flex items-center gap-4">
                                     <button
                                         onClick={() => toggleStatus(tarefa.id, tarefa.status)}
-                                        className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                                        className="shrink-0 text-gray-500 hover:text-violet-400 transition-colors"
                                     >
                                         {tarefa.status === 'done' ? (
                                             <CheckSquare className="w-5 h-5 text-emerald-500 fill-emerald-50" />
@@ -145,7 +145,7 @@ export default function TarefasPage() {
                                         )}
                                     </button>
                                     <div className="space-y-1">
-                                        <span className={`font-medium ${tarefa.status === 'done' ? 'line-through text-muted-foreground' : ''}`}>
+                                        <span className={`font-medium ${tarefa.status === 'done' ? 'line-through text-gray-500' : 'text-white'}`}>
                                             {tarefa.title}
                                         </span>
                                         {/* Mobile Only Project display */}
@@ -156,25 +156,25 @@ export default function TarefasPage() {
                                 </div>
 
                                 <div className="col-span-3 hidden md:flex items-center">
-                                    <Badge variant="outline" className="font-normal text-xs whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                                    <Badge variant="outline" className="font-normal text-xs whitespace-nowrap overflow-hidden text-ellipsis max-w-full bg-violet-500/10 text-violet-300 border-violet-500/20">
                                         {tarefa.crm_projects?.name || 'Avulsa'}
                                     </Badge>
                                 </div>
 
-                                <div className="col-span-3 md:col-span-2 text-center flex items-center justify-center text-sm text-muted-foreground">
+                                <div className="col-span-3 md:col-span-2 text-center flex items-center justify-center text-sm text-gray-400">
                                     <Calendar className="w-3.5 h-3.5 mr-1" /> {tarefa.due_date ? new Date(tarefa.due_date).toLocaleDateString() : 'Hoje'}
                                 </div>
 
                                 <div className="col-span-3 md:col-span-2 flex justify-end items-center gap-4">
-                                    <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/40 border">
+                                    <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.06] text-white">
                                         {priorityIcon[tarefa.priority as keyof typeof priorityIcon]}
                                         <span className="text-xs uppercase font-medium">{tarefa.priority}</span>
                                     </div>
                                     <div className="sm:hidden">
                                         {priorityIcon[tarefa.priority as keyof typeof priorityIcon]}
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-background flex items-center justify-center shrink-0 shadow-sm opacity-50 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-xs font-semibold">Eu</span>
+                                    <div className="w-8 h-8 rounded-full bg-violet-600/20 border-2 border-[#12142a] flex items-center justify-center shrink-0 shadow-sm opacity-50 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-xs font-semibold text-violet-300">Eu</span>
                                     </div>
                                 </div>
                             </div>

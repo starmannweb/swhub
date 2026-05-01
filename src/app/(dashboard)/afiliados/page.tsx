@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import {
     Users, Copy, CheckCircle2, DollarSign, MousePointerClick, TrendingUp,
     Award, Share2, Mail, ArrowRight, Percent, Crown, Trophy, Star,
-    ExternalLink, Loader2, Send, Gift, BarChart3, Wallet, Eye,
+    ExternalLink, Loader2, Send, Gift, BarChart3, Wallet, Eye, Megaphone,
 } from "lucide-react"
 
 type AffiliateTab = "dashboard" | "afiliados" | "materiais" | "formulario"

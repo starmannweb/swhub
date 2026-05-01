@@ -140,24 +140,24 @@ export default function FaturasPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border-l-4 border-l-emerald-500 shadow-sm">
+                <Card className="border-l-4 border-l-emerald-500 shadow-sm bg-[#12142a] border-y border-r border-white/[0.06]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Caixa Recebido</CardTitle>
                         <ShieldCheck className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(getTotalRecebido())}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Total de Faturas Pagas</p>
+                        <div className="text-2xl font-bold text-emerald-400">{formatCurrency(getTotalRecebido())}</div>
+                        <p className="text-xs text-gray-500 mt-1">Total de Faturas Pagas</p>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-amber-500 shadow-sm">
+                <Card className="border-l-4 border-l-amber-500 shadow-sm bg-[#12142a] border-y border-r border-white/[0.06]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">A Receber</CardTitle>
                         <Clock className="h-4 w-4 text-amber-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-700 dark:text-slate-200">{formatCurrency(getTotalPendente())}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Aguardando Pagamento</p>
+                        <div className="text-2xl font-bold text-white">{formatCurrency(getTotalPendente())}</div>
+                        <p className="text-xs text-gray-500 mt-1">Aguardando Pagamento</p>
                     </CardContent>
                 </Card>
             </div>
@@ -177,7 +177,7 @@ export default function FaturasPage() {
                         const isOverdue = fatura.status === 'overdue'
 
                         return (
-                            <Card key={fatura.id} className={`overflow-hidden transition-all border ${isPaid ? 'border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/20' : isOverdue ? 'border-red-500/50' : 'hover:border-primary/50'} shadow-sm flex flex-col`}>
+                            <Card key={fatura.id} className={`overflow-hidden transition-all border ${isPaid ? 'border-emerald-500/30 bg-emerald-950/20' : isOverdue ? 'border-red-500/50 bg-[#12142a]' : 'border-white/[0.06] hover:border-violet-500/50 bg-[#12142a]'} shadow-sm flex flex-col text-white`}>
                                 <CardHeader className="pb-2">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function FaturasPage() {
                                     <CardDescription>{fatura.crm_contacts?.name || 'Cliente Removido'}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex-1 pb-4">
-                                    <h3 className={`text-3xl font-bold tracking-tight mb-4 ${isPaid ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
+                                    <h3 className={`text-3xl font-bold tracking-tight mb-4 ${isPaid ? 'text-emerald-400' : 'text-white'}`}>
                                         {formatCurrency(fatura.amount)}
                                     </h3>
 
@@ -229,7 +229,7 @@ export default function FaturasPage() {
                                         </div>
                                     )}
                                 </CardContent>
-                                <div className={`p-3 text-xs border-t mt-auto flex justify-between items-center ${isPaid ? 'bg-emerald-500/10' : 'bg-muted/30'}`}>
+                                <div className={`p-3 text-xs border-t border-white/[0.06] mt-auto flex justify-between items-center ${isPaid ? 'bg-emerald-500/10' : 'bg-white/[0.02]'}`}>
                                     <span className="text-muted-foreground flex items-center gap-1">
                                         {isPaid ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clock className="w-3.5 h-3.5" />}
                                         {isPaid ? `Pago em ${new Date(fatura.paid_at).toLocaleDateString()}` : 'Aguardando Cliente'}
