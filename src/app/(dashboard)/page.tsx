@@ -113,6 +113,14 @@ const stats = [
     { title: "SITES PUBLICADOS", value: "0", icon: Globe, iconBg: "bg-blue-500/15 text-blue-400" },
 ]
 
+const implementationServices = [
+    { icon: Settings2, title: "Setup do Sistema", desc: "Configuração inicial completa da plataforma", href: "/configuracoes" },
+    { icon: Palette, title: "Customização", desc: "Personalização visual e funcional do seu Hub", href: "/sites" },
+    { icon: Target, title: "Integração com Ads", desc: "Meta Ads, Google Ads, pixels e conversões", href: "/configuracoes?tab=integracoes" },
+    { icon: GitBranch, title: "Ajuste de Funil", desc: "Otimização do pipeline e etapas de vendas", href: "/configuracoes?tab=pipeline" },
+    { icon: Bot, title: "Automações de IA", desc: "Agentes inteligentes e follow-up automatizado", href: "/automacoes" },
+]
+
 export default async function DashboardPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -236,14 +244,8 @@ export default async function DashboardPage() {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        {[
-                            { icon: Settings2, title: "Setup do Sistema", desc: "Configuração inicial completa da plataforma" },
-                            { icon: Palette, title: "Customização", desc: "Personalização visual e funcional do seu Hub" },
-                            { icon: Target, title: "Integração com Ads", desc: "Meta Ads, Google Ads, pixels e conversões" },
-                            { icon: GitBranch, title: "Ajuste de Funil", desc: "Otimização do pipeline e etapas de vendas" },
-                            { icon: Bot, title: "Automações de IA", desc: "Agentes inteligentes e follow-up automatizado" },
-                        ].map((service) => (
-                            <div key={service.title} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] hover:border-fuchsia-300 dark:hover:border-fuchsia-500/20 transition-colors group cursor-pointer">
+                        {implementationServices.map((service) => (
+                            <Link key={service.title} href={service.href} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] hover:border-fuchsia-300 dark:hover:border-fuchsia-500/20 transition-colors group">
                                 <div className="p-1.5 rounded-lg bg-fuchsia-500/10">
                                     <service.icon className="h-3.5 w-3.5 text-fuchsia-400/70" />
                                 </div>
@@ -252,7 +254,7 @@ export default async function DashboardPage() {
                                     <p className="text-[10px] text-slate-400 dark:text-gray-600">{service.desc}</p>
                                 </div>
                                 <ArrowRight className="h-4 w-4 text-slate-300 dark:text-gray-700 group-hover:text-fuchsia-500 dark:group-hover:text-fuchsia-400 transition-colors shrink-0" />
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
-    Plus, Trash2, Download, FileText, Image, FileArchive, Film,
-    Loader2, Upload, ExternalLink,
+    Plus, Trash2, Download, FileText, Image as ImageIcon, FileArchive, Film,
+    Loader2, ExternalLink,
 } from "lucide-react"
 import {
     Dialog,
@@ -37,9 +37,9 @@ const fileTypeIcons: Record<string, React.ReactNode> = {
     pdf: <FileText className="h-5 w-5 text-red-400" />,
     doc: <FileText className="h-5 w-5 text-blue-400" />,
     docx: <FileText className="h-5 w-5 text-blue-400" />,
-    png: <Image className="h-5 w-5 text-green-400" />,
-    jpg: <Image className="h-5 w-5 text-green-400" />,
-    jpeg: <Image className="h-5 w-5 text-green-400" />,
+    png: <ImageIcon className="h-5 w-5 text-green-400" />,
+    jpg: <ImageIcon className="h-5 w-5 text-green-400" />,
+    jpeg: <ImageIcon className="h-5 w-5 text-green-400" />,
     zip: <FileArchive className="h-5 w-5 text-amber-400" />,
     rar: <FileArchive className="h-5 w-5 text-amber-400" />,
     mp4: <Film className="h-5 w-5 text-violet-400" />,
@@ -59,7 +59,7 @@ function formatFileSize(bytes: number | null) {
 }
 
 export default function AdminMateriaisPage() {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const [materials, setMaterials] = useState<Material[]>([])
     const [loading, setLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -72,11 +72,7 @@ export default function AdminMateriaisPage() {
     const [fileType, setFileType] = useState("")
     const [thumbnailUrl, setThumbnailUrl] = useState("")
 
-    useEffect(() => {
-        fetchMaterials()
-    }, [])
-
-    async function fetchMaterials() {
+    const fetchMaterials = useCallback(async () => {
         setLoading(true)
         const { data, error } = await supabase
             .from("materials")
@@ -85,7 +81,15 @@ export default function AdminMateriaisPage() {
 
         if (!error && data) setMaterials(data)
         setLoading(false)
-    }
+    }, [supabase])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void fetchMaterials()
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [fetchMaterials])
 
     function resetForm() {
         setTitle("")

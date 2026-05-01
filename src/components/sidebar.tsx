@@ -13,7 +13,6 @@ import {
     Zap,
     KanbanSquare,
     Briefcase,
-    CheckSquare,
     FileText,
     CreditCard,
     Megaphone,
@@ -21,12 +20,7 @@ import {
     PanelLeftOpen,
     ChevronDown,
     GraduationCap,
-    MessageCircle,
-    LayoutTemplate,
     Headset,
-    Download,
-    ShieldCheck,
-    GlobeLock,
     type LucideIcon,
 } from "lucide-react"
 
@@ -181,12 +175,12 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                         className={cn(
                                             "flex items-center w-full rounded-xl transition-colors",
                                             active
-                                                ? "text-violet-600 dark:text-violet-400"
-                                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-gray-200",
+                                                ? "bg-gradient-to-r from-violet-100 via-purple-100 to-fuchsia-50 text-violet-700 ring-1 ring-violet-200/70 shadow-sm dark:from-violet-600/35 dark:via-purple-600/25 dark:to-fuchsia-600/15 dark:text-white dark:ring-violet-400/10"
+                                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-gray-200",
                                             isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                         )}
                                     >
-                                        <section.icon className="h-[18px] w-[18px] shrink-0" />
+                                        <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-600 dark:text-violet-300")} />
                                         {!isCollapsed && (
                                             <>
                                                 <span className="flex-1 text-left whitespace-nowrap">{section.title}</span>
@@ -210,14 +204,14 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                                         className={cn(
                                                             "flex items-center gap-3 px-4 py-2 text-[13px] font-medium transition-all relative",
                                                             itemActive
-                                                                ? "text-violet-600 dark:text-violet-400 bg-slate-50 dark:bg-white/[0.02]"
-                                                                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/[0.02]"
+                                                                ? "bg-gradient-to-r from-violet-100 via-purple-100 to-fuchsia-50 text-violet-700 dark:from-violet-600/35 dark:via-purple-600/25 dark:to-fuchsia-600/15 dark:text-white"
+                                                                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/[0.06]"
                                                         )}
                                                     >
                                                         {itemActive && (
-                                                            <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-violet-600 dark:bg-violet-400 rounded-r-full" />
+                                                            <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-violet-600 dark:bg-violet-300 rounded-r-full" />
                                                         )}
-                                                        <item.icon className="h-[14px] w-[14px] shrink-0" />
+                                                        <item.icon className={cn("h-[14px] w-[14px] shrink-0", itemActive && "text-violet-600 dark:text-violet-300")} />
                                                         <span className="whitespace-nowrap">{item.title}</span>
                                                     </Link>
                                                 )
@@ -237,12 +231,12 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                 className={cn(
                                     "flex items-center rounded-xl transition-colors",
                                     active
-                                        ? "text-white bg-violet-600 shadow-md"
-                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-gray-200",
+                                        ? "bg-gradient-to-r from-violet-100 via-purple-100 to-fuchsia-50 text-violet-700 ring-1 ring-violet-200/70 shadow-sm dark:from-violet-600/35 dark:via-purple-600/25 dark:to-fuchsia-600/15 dark:text-white dark:ring-violet-400/10"
+                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-gray-200",
                                     isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                 )}
                             >
-                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-white")} />
+                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-600 dark:text-violet-300")} />
                                 {!isCollapsed && <span className="whitespace-nowrap">{section.title}</span>}
                             </Link>
                         )

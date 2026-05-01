@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +18,10 @@ type PipelineStage = {
     color: string
 }
 
+type ConfigTab = "geral" | "pipeline" | "integracoes" | "financeiro" | "admin"
+
+const CONFIG_TABS: ConfigTab[] = ["geral", "pipeline", "integracoes", "financeiro", "admin"]
+
 const STAGE_COLORS = [
     { value: "gray", label: "Cinza", bg: "bg-gray-400" },
     { value: "blue", label: "Azul", bg: "bg-blue-400" },
@@ -28,15 +33,27 @@ const STAGE_COLORS = [
     { value: "emerald", label: "Esmeralda", bg: "bg-emerald-400" },
 ]
 
+function isConfigTab(value: string | null): value is ConfigTab {
+    return CONFIG_TABS.includes(value as ConfigTab)
+}
+
 export default function ConfiguracoesPage() {
     const supabase = useMemo(() => createClient(), [])
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const tabParam = searchParams.get("tab")
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [pipelineId, setPipelineId] = useState<string | null>(null)
     const [pipelineName, setPipelineName] = useState("")
     const [stages, setStages] = useState<PipelineStage[]>([])
-    const [tab, setTab] = useState<"geral" | "pipeline" | "integracoes" | "financeiro" | "admin">("geral")
+    const [tab, setTab] = useState<ConfigTab>(() => isConfigTab(tabParam) ? tabParam : "geral")
     const [isAdmin, setIsAdmin] = useState(false)
+
+    const handleTabChange = useCallback((nextTab: ConfigTab) => {
+        setTab(nextTab)
+        router.replace(nextTab === "geral" ? "/configuracoes" : `/configuracoes?tab=${nextTab}`, { scroll: false })
+    }, [router])
 
     const fetchPipeline = useCallback(async () => {
         setLoading(true)
@@ -81,6 +98,16 @@ export default function ConfiguracoesPage() {
 
         return () => window.clearTimeout(timer)
     }, [fetchPipeline])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            if (isConfigTab(tabParam) && tabParam !== tab) {
+                setTab(tabParam)
+            }
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [tab, tabParam])
 
     function handleAddStage() {
         if (!pipelineId) return
@@ -178,7 +205,7 @@ export default function ConfiguracoesPage() {
             {/* Tabs */}
             <div className="flex items-center flex-wrap gap-2 md:gap-0 md:flex-nowrap rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#12142a] p-0.5 w-fit">
                 <button
-                    onClick={() => setTab("geral")}
+                    onClick={() => handleTabChange("geral")}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                         tab === "geral" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                     }`}
@@ -186,7 +213,7 @@ export default function ConfiguracoesPage() {
                     <Settings className="h-3.5 w-3.5" /> Geral
                 </button>
                 <button
-                    onClick={() => setTab("pipeline")}
+                    onClick={() => handleTabChange("pipeline")}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                         tab === "pipeline" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                     }`}
@@ -194,7 +221,7 @@ export default function ConfiguracoesPage() {
                     <KanbanSquare className="h-3.5 w-3.5" /> Pipeline CRM
                 </button>
                 <button
-                    onClick={() => setTab("integracoes")}
+                    onClick={() => handleTabChange("integracoes")}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                         tab === "integracoes" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                     }`}
@@ -202,7 +229,7 @@ export default function ConfiguracoesPage() {
                     <Share2 className="h-3.5 w-3.5" /> Marketplace & Integrações
                 </button>
                 <button
-                    onClick={() => setTab("financeiro")}
+                    onClick={() => handleTabChange("financeiro")}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                         tab === "financeiro" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                     }`}
@@ -211,7 +238,7 @@ export default function ConfiguracoesPage() {
                 </button>
                 {isAdmin && (
                     <button
-                        onClick={() => setTab("admin")}
+                        onClick={() => handleTabChange("admin")}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                             tab === "admin" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                         }`}
