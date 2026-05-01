@@ -97,15 +97,16 @@ export default function SitesPage() {
     return (
         <div className="space-y-8">
             {/* ── Header ── */}
-            <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
-                    <Globe className="h-6 w-6" />
+            <div>
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
+                        <Globe className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Criar Novo Site</h1>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">Escolha como deseja começar seu novo projeto</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Criar Novo Site</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-500">Escolha como deseja começar seu novo projeto</p>
-                </div>
-            </div>
 
                 <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-6">
                     {/* Site Name */}
