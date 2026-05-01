@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import Link from "next/link"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Bell, MessageCircle } from "lucide-react"
+import { LogOut, User, Bell, MessageCircle, HelpCircle } from "lucide-react"
 
 interface HeaderProps {
     userEmail?: string
@@ -53,6 +54,11 @@ export function Header({ userEmail, userName }: HeaderProps) {
                     <a href="https://discord.gg/seu-link-aqui" target="_blank" rel="noopener noreferrer" title="Comunidade Discord">
                         <MessageCircle className="h-4 w-4" />
                     </a>
+                </Button>
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.06]" asChild>
+                    <Link href="/suporte" title="Ajuda e Suporte">
+                        <HelpCircle className="h-4 w-4" />
+                    </Link>
                 </Button>
 
                 <ThemeToggle />

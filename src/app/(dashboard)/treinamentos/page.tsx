@@ -53,14 +53,16 @@ export default function TreinamentosPage() {
 
     return (
         <div className="space-y-6">
-            {/* Header Banner */}
-            <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-violet-600/20 to-purple-600/10 border border-violet-500/10 px-6 py-5">
-                <div className="p-3 rounded-xl bg-violet-600/20">
-                    <Play className="h-6 w-6 text-violet-400" />
-                </div>
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Tutoriais em Vídeo</h1>
-                    <p className="text-sm text-slate-500 dark:text-gray-400">Assista, aplique e publique mais rápido.</p>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
+                        <Play className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Tutoriais em Vídeo</h1>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">Assista, aplique e publique mais rápido.</p>
+                    </div>
                 </div>
             </div>
 

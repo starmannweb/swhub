@@ -73,7 +73,7 @@ export default function RelatoriosPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
                     <BarChart3 className="h-6 w-6" />
                 </div>
                 <div>
@@ -90,7 +90,7 @@ export default function RelatoriosPage() {
                         onClick={() => setTab(t.key)}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
                             tab === t.key
-                                ? "bg-emerald-500/20 text-emerald-400"
+                                ? "bg-violet-500/20 text-violet-600 dark:text-violet-400"
                                 : "text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300"
                         }`}
                     >

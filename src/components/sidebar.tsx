@@ -237,12 +237,12 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                 className={cn(
                                     "flex items-center rounded-xl transition-colors",
                                     active
-                                        ? "text-violet-700 bg-violet-50 dark:text-white dark:bg-gradient-to-r dark:from-violet-600/30 dark:to-violet-700/10 shadow-sm"
+                                        ? "text-white bg-violet-600 shadow-md"
                                         : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-gray-200",
                                     isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                 )}
                             >
-                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-600 dark:text-violet-400")} />
+                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-white")} />
                                 {!isCollapsed && <span className="whitespace-nowrap">{section.title}</span>}
                             </Link>
                         )

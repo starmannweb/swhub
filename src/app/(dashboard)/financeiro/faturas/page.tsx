@@ -118,36 +118,41 @@ export default function FaturasPage() {
 
     return (
         <div className="flex-1 space-y-6 pt-6 px-4 md:px-8 max-w-7xl mx-auto w-full mb-10">
-            <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Faturas & Cobranças</h2>
-                    <p className="text-muted-foreground">
-                        Centro de recebimentos financeiros PIX, Boleto e Cartão.
-                    </p>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
+                        <CreditCard className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Faturas e Cobranças</h1>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">Gestão financeira e links de pagamento</p>
+                    </div>
                 </div>
                 <div className="flex items-center space-x-2 w-full sm:w-auto">
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 dark:text-gray-500" />
                         <Input
                             placeholder="Buscar fatura..."
-                            className="pl-8 bg-muted/40"
+                            className="pl-8 bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white placeholder:text-slate-400"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
-                    <Button variant="outline" size="icon"><Filter className="h-4 w-4" /></Button>
-                    <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700"><Plus className="mr-2 h-4 w-4" /> Nova Cobrança</Button>
+                    <Button variant="outline" size="icon" className="bg-white dark:bg-[#12142a] border-slate-200 dark:border-white/[0.06] text-slate-700 dark:text-white"><Filter className="h-4 w-4" /></Button>
+                    <Button onClick={() => setIsModalOpen(true)} className="bg-violet-600 hover:bg-violet-700 text-white shrink-0">
+                        <Plus className="mr-2 h-4 w-4" /> Nova Fatura
+                    </Button>
                 </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border-l-4 border-l-emerald-500 shadow-sm bg-white dark:bg-[#12142a] border-y border-r border-slate-200 dark:border-white/[0.06]">
+                <Card className="border-l-4 border-l-violet-500 shadow-sm bg-white dark:bg-[#12142a] border-y border-r border-slate-200 dark:border-white/[0.06]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Caixa Recebido</CardTitle>
-                        <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                        <ShieldCheck className="h-4 w-4 text-violet-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-emerald-400">{formatCurrency(getTotalRecebido())}</div>
+                        <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{formatCurrency(getTotalRecebido())}</div>
                         <p className="text-xs text-gray-500 mt-1">Total de Faturas Pagas</p>
                     </CardContent>
                 </Card>
@@ -294,7 +299,7 @@ export default function FaturasPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsModalOpen(false)} className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-300">Cancelar</Button>
-                        <Button onClick={handleAddFatura} className="bg-emerald-600 hover:bg-emerald-700 text-white">Gerar Cobrança</Button>
+                        <Button onClick={handleAddFatura} className="bg-violet-600 hover:bg-violet-700 text-white">Gerar Cobrança</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

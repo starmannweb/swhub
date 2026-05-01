@@ -8,8 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import {
     Plus, Search, Filter,
-    MoreHorizontal, Calendar, FileText, Send, CheckCircle2, Clock, XCircle, Link2
+    MoreHorizontal, Calendar, FileText, Send, CheckCircle2, Clock, XCircle, Link2, MoreVertical
 } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function CrmPropostasPage() {
     const supabase = createClient()
@@ -114,6 +120,13 @@ export default function CrmPropostasPage() {
         p.crm_contacts?.name?.toLowerCase().includes(search.toLowerCase())
     )
 
+    const updateStatus = async (id: string, newStatus: string) => {
+        const { error } = await supabase.from('crm_proposals').update({ status: newStatus }).eq('id', id)
+        if (!error) {
+            setPropostas(propostas.map(p => p.id === id ? { ...p, status: newStatus } : p))
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -138,7 +151,7 @@ export default function CrmPropostasPage() {
                     </div>
                     <Button
                         onClick={handleAddProposta}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                        className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Nova Proposta
                     </Button>
@@ -166,6 +179,7 @@ export default function CrmPropostasPage() {
                         <div className="col-span-2 text-center">Valor</div>
                         <div className="col-span-2 text-center">Status</div>
                         <div className="col-span-2 text-center">Validade</div>
+                        <div className="col-span-1 text-center"></div>
                     </div>
 
                     <div className="divide-y divide-slate-100 dark:divide-white/5">
@@ -212,6 +226,28 @@ export default function CrmPropostasPage() {
                                             {proposta.valid_until ? new Date(proposta.valid_until).toLocaleDateString('pt-BR') : '—'}
                                         </span>
                                         {isExpired && <span className="text-red-500 text-[10px] ml-1">(Vencida)</span>}
+                                    </div>
+
+                                    <div className="col-span-1 md:col-span-1 flex justify-end">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                                                    <span className="sr-only">Abrir menu</span>
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white">
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => updateStatus(proposta.id, 'sent')}>
+                                                    <Send className="mr-2 h-4 w-4 text-blue-500" /> Marcar como Enviada
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => updateStatus(proposta.id, 'accepted')}>
+                                                    <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-500" /> Marcar como Aceita
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => updateStatus(proposta.id, 'rejected')}>
+                                                    <XCircle className="mr-2 h-4 w-4 text-red-500" /> Marcar como Recusada
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                             )
