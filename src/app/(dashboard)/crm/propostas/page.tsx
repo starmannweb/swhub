@@ -144,7 +144,7 @@ export default function CrmPropostasPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                         <Input
                             placeholder="Buscar proposta..."
-                            className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white dark:placeholder:text-gray-600"
+                            className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-[#12142a] dark:border-white/10 dark:text-white dark:placeholder:text-gray-600"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -163,7 +163,7 @@ export default function CrmPropostasPage() {
                     <div className="w-5 h-5 rounded-full border-t-2 border-emerald-500 animate-spin" />
                 </div>
             ) : filteredPropostas.length === 0 ? (
-                <div className="rounded-xl bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-white/5 p-12 text-center shadow-sm">
+                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-12 text-center shadow-sm">
                     <FileText className="h-10 w-10 text-slate-300 dark:text-gray-600 mx-auto mb-3" />
                     <h3 className="text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Nenhuma proposta encontrada</h3>
                     <p className="text-xs text-slate-500 dark:text-gray-600">Crie sua primeira proposta e vincule a um negócio do pipeline.</p>
@@ -172,8 +172,8 @@ export default function CrmPropostasPage() {
                     </Button>
                 </div>
             ) : (
-                <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm">
-                    <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#161616] hidden md:grid">
+                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden shadow-sm">
+                    <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#161616] hidden md:grid">
                         <div className="col-span-4">Cliente & Título</div>
                         <div className="col-span-2 text-center">Negócio</div>
                         <div className="col-span-2 text-center">Valor</div>
@@ -236,7 +236,7 @@ export default function CrmPropostasPage() {
                                                     <MoreVertical className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white">
+                                            <DropdownMenuContent align="end" className="bg-white dark:bg-[#12142a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white">
                                                 <DropdownMenuItem className="cursor-pointer" onClick={() => updateStatus(proposta.id, 'sent')}>
                                                     <Send className="mr-2 h-4 w-4 text-blue-500" /> Marcar como Enviada
                                                 </DropdownMenuItem>

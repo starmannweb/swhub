@@ -14,7 +14,7 @@ export default function SuportePage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-xl bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-white/5 p-6 text-center hover:border-emerald-500/20 transition-colors">
+                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 text-center hover:border-emerald-500/20 transition-colors">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 mb-4">
                         <MessageCircle className="h-6 w-6 text-emerald-400" />
                     </div>
@@ -27,7 +27,7 @@ export default function SuportePage() {
                     </button>
                 </div>
 
-                <div className="rounded-xl bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-white/5 p-6 text-center hover:border-blue-500/20 transition-colors">
+                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 text-center hover:border-blue-500/20 transition-colors">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 mb-4">
                         <Mail className="h-6 w-6 text-blue-400" />
                     </div>
@@ -43,7 +43,7 @@ export default function SuportePage() {
                     </a>
                 </div>
 
-                <div className="rounded-xl bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-white/5 p-6 text-center hover:border-violet-500/20 transition-colors">
+                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 text-center hover:border-violet-500/20 transition-colors">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-violet-500/20 mb-4">
                         <FileQuestion className="h-6 w-6 text-violet-400" />
                     </div>
@@ -57,7 +57,7 @@ export default function SuportePage() {
                 </div>
             </div>
 
-            <div className="rounded-xl bg-white dark:bg-[#1e1e1e] border border-slate-200 dark:border-white/5 p-6">
+            <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Enviar uma solicitação</h3>
                 <form className="space-y-4">
                     <div>
@@ -65,7 +65,7 @@ export default function SuportePage() {
                         <input
                             type="text"
                             placeholder="Descreva brevemente o problema"
-                            className="w-full px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-[#111] border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50"
+                            className="w-full px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50"
                         />
                     </div>
                     <div>
@@ -73,7 +73,7 @@ export default function SuportePage() {
                         <textarea
                             rows={4}
                             placeholder="Detalhe sua dúvida ou problema..."
-                            className="w-full px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-[#111] border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+                            className="w-full px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
                         />
                     </div>
                     <button

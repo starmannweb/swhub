@@ -238,7 +238,7 @@ export default function CrmDealsPage() {
     return (
         <div className="flex flex-col h-[calc(100vh-theme(spacing.16))]">
             {/* Header */}
-            <div className="flex-none px-4 md:px-8 pt-6 pb-4 space-y-4">
+            <div className="flex-none pb-4 space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
@@ -253,7 +253,7 @@ export default function CrmDealsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                         {/* View Toggle */}
-                        <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e1e1e] p-0.5">
+                        <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#12142a] p-0.5">
                             <button
                                 onClick={() => setViewMode('kanban')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -306,7 +306,7 @@ export default function CrmDealsPage() {
 
             {/* Kanban View */}
             {viewMode === 'kanban' && (
-                <div className="flex-1 overflow-x-auto overflow-y-hidden px-4 md:px-8 pb-8 pt-2">
+                <div className="flex-1 overflow-x-auto overflow-y-hidden pb-8 pt-2">
                     <div className="flex h-full gap-4 items-start">
                         {stages.map((stage) => {
                             const stageDeals = deals.filter(d => d.stage_id === stage.id)
@@ -406,7 +406,7 @@ export default function CrmDealsPage() {
 
             {/* List View */}
             {viewMode === 'list' && (
-                <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8 pt-2">
+                <div className="flex-1 overflow-y-auto pb-8 pt-2">
                     <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden">
                         {/* Table Header */}
                         <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a]">

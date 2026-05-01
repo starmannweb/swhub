@@ -223,7 +223,7 @@ export default function ConfiguracoesPage() {
 
             {/* Meus Dados Tab */}
             {tab === "conta" && (
-                <div className="space-y-6 max-w-4xl">
+                <div className="space-y-6 w-full">
                     <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
                         <h2 className="text-sm font-bold text-slate-900 dark:text-white">Informações Pessoais</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,7 +284,7 @@ export default function ConfiguracoesPage() {
 
             {/* Integrações Tab */}
             {tab === "integracoes" && (
-                <div className="space-y-6 max-w-4xl">
+                <div className="space-y-6 w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* IA Integration */}
                         <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
@@ -350,7 +350,7 @@ export default function ConfiguracoesPage() {
 
             {/* Pipeline Settings */}
             {tab === "pipeline" && (
-                <div className="space-y-6">
+                <div className="space-y-6 w-full">
                     {loading ? (
                         <div className="flex justify-center py-16">
                             <Loader2 className="h-6 w-6 animate-spin text-slate-400 dark:text-gray-500" />
@@ -470,7 +470,7 @@ export default function ConfiguracoesPage() {
 
             {/* Geral Tab */}
             {tab === "geral" && (
-                <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-8 text-center shadow-sm">
+                <div className="space-y-6 w-full rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-8 text-center shadow-sm">
                     <Settings className="h-8 w-8 text-slate-300 dark:text-gray-700 mx-auto mb-3" />
                     <p className="text-sm text-slate-500 dark:text-gray-400 font-semibold">Configurações gerais em breve</p>
                     <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Perfil, notificações, integrações e preferências do sistema.</p>

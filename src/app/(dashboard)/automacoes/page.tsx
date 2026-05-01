@@ -279,8 +279,8 @@ export default function AutomacoesPage() {
 
                 {/* INFINITE GRID BACKGROUND */}
                 <div
-                    className="absolute inset-0 z-0 pointer-events-none opacity-10 dark:opacity-[0.05]"
-                    style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '30px 30px', color: 'gray' }}
+                    className="absolute inset-0 z-0 pointer-events-none opacity-[0.04] dark:opacity-[0.02]"
+                    style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '30px 30px', color: '#94a3b8' }}
                 ></div>
 
                 {/* 3. CANVAS CONTENT */}

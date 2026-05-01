@@ -83,7 +83,7 @@ export default function RelatoriosPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e1e1e] p-0.5 w-fit">
+            <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#12142a] p-0.5 w-fit">
                 {tabs.map(t => (
                     <button
                         key={t.key}
@@ -103,7 +103,7 @@ export default function RelatoriosPage() {
             {tab === "sites" && (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Visualizações</span>
                                 <Eye className="h-4 w-4 text-blue-400" />
@@ -111,7 +111,7 @@ export default function RelatoriosPage() {
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">0</p>
                             <p className="text-[10px] text-slate-400 dark:text-gray-600 mt-1">Total de visitas nos seus sites</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Tempo Médio</span>
                                 <Clock className="h-4 w-4 text-amber-400" />
@@ -119,7 +119,7 @@ export default function RelatoriosPage() {
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">0s</p>
                             <p className="text-[10px] text-slate-400 dark:text-gray-600 mt-1">Tempo médio por sessão</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Taxa de Conversão</span>
                                 <TrendingUp className="h-4 w-4 text-emerald-400" />
@@ -127,7 +127,7 @@ export default function RelatoriosPage() {
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">0%</p>
                             <p className="text-[10px] text-slate-400 dark:text-gray-600 mt-1">Visitantes que converteram</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Visitantes Únicos</span>
                                 <Users className="h-4 w-4 text-violet-400" />
@@ -137,7 +137,7 @@ export default function RelatoriosPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-8 text-center">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-8 text-center">
                         <Eye className="h-8 w-8 text-gray-700 mx-auto mb-3" />
                         <p className="text-sm text-gray-400 font-semibold">Rastreamento em breve</p>
                         <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">As métricas de visitação serão coletadas automaticamente após configurar o tracking nos seus sites.</p>
@@ -148,7 +148,7 @@ export default function RelatoriosPage() {
             {/* ── CRM Tab (Funnel) ── */}
             {tab === "crm" && (
                 <div className="space-y-6">
-                    <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-6">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
                         <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Funil de Negócios</h2>
 
                         {stages.length === 0 ? (
@@ -185,21 +185,21 @@ export default function RelatoriosPage() {
 
                     {/* CRM extra cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Rastreamento</span>
                                 <Filter className="h-4 w-4 text-blue-400" />
                             </div>
                             <p className="text-xs text-slate-400 dark:text-gray-600">Acompanhe de onde vêm seus leads (Ads, Indicação, Orgânico)</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Tarefas</span>
                                 <BarChart3 className="h-4 w-4 text-amber-400" />
                             </div>
                             <p className="text-xs text-slate-400 dark:text-gray-600">Métricas de tarefas concluídas vs pendentes</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Propostas</span>
                                 <TrendingUp className="h-4 w-4 text-emerald-400" />
@@ -214,7 +214,7 @@ export default function RelatoriosPage() {
             {tab === "financeiro" && (
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Gastos em Ads</span>
                                 <Megaphone className="h-4 w-4 text-blue-400" />
@@ -222,7 +222,7 @@ export default function RelatoriosPage() {
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">R$ 0,00</p>
                             <p className="text-[10px] text-slate-400 dark:text-gray-600 mt-1">Total investido em anúncios</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">Entrada de Clientes</span>
                                 <DollarSign className="h-4 w-4 text-emerald-400" />
@@ -230,7 +230,7 @@ export default function RelatoriosPage() {
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">R$ 0,00</p>
                             <p className="text-[10px] text-slate-400 dark:text-gray-600 mt-1">Receita total de novos clientes</p>
                         </div>
-                        <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-5">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-xs text-slate-500 dark:text-gray-500 font-medium">ROI</span>
                                 <ArrowDownRight className="h-4 w-4 text-amber-400" />
@@ -240,7 +240,7 @@ export default function RelatoriosPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-xl bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 p-8 text-center">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-8 text-center">
                         <DollarSign className="h-8 w-8 text-gray-700 mx-auto mb-3" />
                         <p className="text-sm text-gray-400 font-semibold">Integração financeira em breve</p>
                         <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Conecte suas contas de Ads e pagamentos para visualizar relatórios financeiros automaticamente.</p>
