@@ -43,7 +43,7 @@ const TIERS = [
         name: "Prata",
         icon: Trophy,
         color: "from-gray-400 to-gray-600",
-        textColor: "text-gray-300",
+        textColor: "text-slate-700 dark:text-gray-300",
         bgColor: "bg-gray-400/15",
         borderColor: "border-gray-400/20",
         commission: "15%",
@@ -129,14 +129,14 @@ export default function AfiliadosPage() {
                         <Megaphone className="h-6 w-6 text-violet-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Programa de Afiliados</h1>
-                        <p className="text-sm text-gray-500">Transforme seus clientes em promotores e ganhe comissões recorrentes.</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Programa de Afiliados</h1>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">Transforme seus clientes em promotores e ganhe comissões recorrentes.</p>
                     </div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center rounded-lg border border-white/10 bg-[#12142a] p-0.5 w-fit">
+            <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#12142a] p-0.5 w-fit">
                 {[
                     { key: "dashboard" as const, label: "Visão Geral", icon: BarChart3 },
                     { key: "afiliados" as const, label: "Meus Afiliados", icon: Users },
@@ -147,7 +147,7 @@ export default function AfiliadosPage() {
                         key={t.key}
                         onClick={() => setTab(t.key)}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                            tab === t.key ? "bg-violet-500/20 text-violet-400" : "text-gray-500 hover:text-gray-300"
+                            tab === t.key ? "bg-violet-500/20 text-violet-400" : "text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300"
                         }`}
                     >
                         <t.icon className="h-3.5 w-3.5" /> {t.label}
@@ -166,10 +166,10 @@ export default function AfiliadosPage() {
                             { title: "TAXA DE CONVERSÃO", value: `${conversionRate}%`, icon: Percent, color: "bg-blue-500/15 text-blue-400" },
                             { title: "COMISSÕES GERADAS", value: formatCurrency(totalEarnings), icon: DollarSign, color: "bg-purple-500/15 text-purple-400" },
                         ].map((stat) => (
-                            <div key={stat.title} className="rounded-xl bg-[#12142a] border border-white/[0.06] p-5 flex items-start justify-between">
+                            <div key={stat.title} className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 flex items-start justify-between">
                                 <div>
-                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-2">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-gray-500 mb-2">{stat.title}</p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                                 </div>
                                 <div className={`p-2 rounded-xl ${stat.color}`}>
                                     <stat.icon className="h-4 w-4" />
@@ -182,18 +182,18 @@ export default function AfiliadosPage() {
                     <div className="rounded-xl bg-gradient-to-r from-violet-600/10 to-purple-600/5 border border-violet-500/10 p-6 space-y-4">
                         <div className="flex items-center gap-2">
                             <Share2 className="h-5 w-5 text-violet-400" />
-                            <h3 className="text-sm font-bold text-white">Seu Link de Afiliado</h3>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Seu Link de Afiliado</h3>
                         </div>
-                        <p className="text-xs text-gray-400">Compartilhe este link. Cada venda gerada por ele gera comissão automática para você.</p>
+                        <p className="text-xs text-slate-500 dark:text-gray-400">Compartilhe este link. Cada venda gerada por ele gera comissão automática para você.</p>
                         <div className="flex gap-2 max-w-2xl">
                             <Input
                                 readOnly
                                 value={affiliateLink}
-                                className="bg-[#0d0f1a] border-white/[0.06] text-white font-mono text-sm h-11"
+                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white font-mono text-sm h-11"
                             />
                             <Button
                                 onClick={() => handleCopy(affiliateLink, setCopied)}
-                                className={`shrink-0 h-11 px-5 ${copied ? "bg-violet-600 text-white" : "bg-white/[0.06] text-gray-300 hover:bg-white/10"}`}
+                                className={`shrink-0 h-11 px-5 ${copied ? "bg-violet-600 text-white" : "bg-white/[0.06] text-slate-700 dark:text-gray-300 hover:bg-white/10"}`}
                             >
                                 {copied ? <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Copiado!</> : <><Copy className="h-4 w-4 mr-1.5" /> Copiar</>}
                             </Button>
@@ -202,10 +202,10 @@ export default function AfiliadosPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Wallet */}
-                        <div className="rounded-xl bg-[#12142a] border border-white/[0.06] p-6 space-y-4">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Wallet className="h-5 w-5 text-violet-400" />
-                                <h3 className="text-sm font-bold text-white">Carteira de Comissões</h3>
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Carteira de Comissões</h3>
                             </div>
                             <div className="rounded-xl bg-gradient-to-br from-violet-600/30 to-purple-700/20 border border-violet-500/10 p-6 text-center">
                                 <p className="text-xs text-white/50 font-medium mb-1">Saldo Disponível</p>
@@ -218,11 +218,11 @@ export default function AfiliadosPage() {
                         </div>
 
                         {/* Top Affiliates */}
-                        <div className="rounded-xl bg-[#12142a] border border-white/[0.06] p-6 space-y-4">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-4">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                     <Trophy className="h-5 w-5 text-yellow-400" />
-                                    <h3 className="text-sm font-bold text-white">Top Afiliados</h3>
+                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">Top Afiliados</h3>
                                 </div>
                                 <button onClick={() => setTab("afiliados")} className="text-[11px] text-violet-400 hover:text-violet-300 transition-colors">Ver todos →</button>
                             </div>
@@ -231,14 +231,14 @@ export default function AfiliadosPage() {
                                     .sort((a, b) => b.earnings - a.earnings)
                                     .slice(0, 3)
                                     .map((aff, idx) => (
-                                        <div key={aff.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0d0f1a] border border-white/[0.06]">
+                                        <div key={aff.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06]">
                                             <div className="flex items-center gap-3">
                                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                                    idx === 0 ? "bg-yellow-500/20 text-yellow-400" : idx === 1 ? "bg-gray-400/20 text-gray-300" : "bg-amber-700/20 text-amber-400"
+                                                    idx === 0 ? "bg-yellow-500/20 text-yellow-400" : idx === 1 ? "bg-gray-400/20 text-slate-700 dark:text-gray-300" : "bg-amber-700/20 text-amber-400"
                                                 }`}>{idx + 1}</span>
                                                 <div>
-                                                    <p className="text-sm font-medium text-white">{aff.name}</p>
-                                                    <p className="text-[10px] text-gray-600">{aff.conversions} conversões</p>
+                                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{aff.name}</p>
+                                                    <p className="text-[10px] text-slate-400 dark:text-gray-600">{aff.conversions} conversões</p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
@@ -253,11 +253,11 @@ export default function AfiliadosPage() {
 
                     {/* Commission Tiers */}
                     <div>
-                        <h3 className="text-sm font-bold text-white mb-1">Níveis de Comissão</h3>
-                        <p className="text-xs text-gray-500 mb-4">Seus afiliados sobem de tier conforme vendem mais.</p>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Níveis de Comissão</h3>
+                        <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">Seus afiliados sobem de tier conforme vendem mais.</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {TIERS.map((tier) => (
-                                <div key={tier.key} className={`rounded-xl bg-[#12142a] border ${tier.borderColor} overflow-hidden`}>
+                                <div key={tier.key} className={`rounded-xl bg-white dark:bg-[#12142a] border ${tier.borderColor} overflow-hidden`}>
                                     <div className={`bg-gradient-to-r ${tier.color} p-4 flex items-center gap-3`}>
                                         <tier.icon className="h-6 w-6 text-white" />
                                         <div>
@@ -270,7 +270,7 @@ export default function AfiliadosPage() {
                                         {tier.benefits.map((b, i) => (
                                             <div key={i} className="flex items-start gap-2">
                                                 <CheckCircle2 className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${tier.textColor}`} />
-                                                <span className="text-xs text-gray-400">{b}</span>
+                                                <span className="text-xs text-slate-500 dark:text-gray-400">{b}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -284,8 +284,8 @@ export default function AfiliadosPage() {
             {/* ═══════ AFILIADOS TAB ═══════ */}
             {tab === "afiliados" && (
                 <div className="space-y-4">
-                    <div className="rounded-xl bg-[#12142a] border border-white/[0.06] overflow-hidden">
-                        <div className="grid grid-cols-12 gap-4 p-4 text-[10px] font-semibold text-gray-500 uppercase tracking-wider border-b border-white/[0.06] bg-[#0d0f1a]">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden">
+                        <div className="grid grid-cols-12 gap-4 p-4 text-[10px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a]">
                             <div className="col-span-3">Afiliado</div>
                             <div className="col-span-1 text-center">Tier</div>
                             <div className="col-span-1 text-center">Status</div>
@@ -297,28 +297,28 @@ export default function AfiliadosPage() {
                         {MOCK_AFFILIATES.length === 0 ? (
                             <div className="p-12 text-center">
                                 <Users className="h-8 w-8 text-gray-700 mx-auto mb-2" />
-                                <p className="text-sm text-gray-500">Nenhum afiliado cadastrado ainda.</p>
+                                <p className="text-sm text-slate-500 dark:text-gray-500">Nenhum afiliado cadastrado ainda.</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-white/[0.04]">
                                 {MOCK_AFFILIATES.map((aff) => (
-                                    <div key={aff.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/[0.02] transition-colors">
+                                    <div key={aff.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
                                         <div className="col-span-3">
-                                            <p className="text-sm font-medium text-white">{aff.name}</p>
-                                            <p className="text-[11px] text-gray-600">{aff.email}</p>
+                                            <p className="text-sm font-medium text-slate-900 dark:text-white">{aff.name}</p>
+                                            <p className="text-[11px] text-slate-400 dark:text-gray-600">{aff.email}</p>
                                         </div>
                                         <div className="col-span-1 flex justify-center">{tierBadge(aff.tier)}</div>
                                         <div className="col-span-1 flex justify-center">{statusBadge(aff.status)}</div>
                                         <div className="col-span-2 text-center">
-                                            <p className="text-sm font-medium text-white">{aff.clicks}</p>
+                                            <p className="text-sm font-medium text-slate-900 dark:text-white">{aff.clicks}</p>
                                         </div>
                                         <div className="col-span-2 text-center">
-                                            <p className="text-sm font-medium text-white">{aff.conversions}</p>
+                                            <p className="text-sm font-medium text-slate-900 dark:text-white">{aff.conversions}</p>
                                         </div>
                                         <div className="col-span-2 text-right">
                                             <p className="text-sm font-bold text-violet-400">{formatCurrency(aff.earnings)}</p>
                                         </div>
-                                        <div className="col-span-1 text-right text-[11px] text-gray-500">
+                                        <div className="col-span-1 text-right text-[11px] text-slate-500 dark:text-gray-500">
                                             {new Date(aff.joinedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
                                         </div>
                                     </div>
@@ -332,20 +332,20 @@ export default function AfiliadosPage() {
             {/* ═══════ MATERIAIS TAB ═══════ */}
             {tab === "materiais" && (
                 <div className="space-y-4">
-                    <p className="text-xs text-gray-400">Materiais prontos para seus afiliados compartilharem. Baixe ou envie diretamente.</p>
+                    <p className="text-xs text-slate-500 dark:text-gray-400">Materiais prontos para seus afiliados compartilharem. Baixe ou envie diretamente.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {SHARE_MATERIALS.map((mat) => (
-                            <div key={mat.title} className="rounded-xl bg-[#12142a] border border-white/[0.06] p-5 flex flex-col justify-between hover:border-violet-500/20 transition-all">
+                            <div key={mat.title} className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 flex flex-col justify-between hover:border-violet-500/20 transition-all">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
                                         <Badge className="bg-violet-500/15 text-violet-400 border border-violet-500/20 text-[10px]">{mat.type}</Badge>
-                                        {mat.size !== "—" && <span className="text-[10px] text-gray-600">{mat.size}</span>}
+                                        {mat.size !== "—" && <span className="text-[10px] text-slate-400 dark:text-gray-600">{mat.size}</span>}
                                     </div>
                                     <h4 className="text-sm font-semibold text-white mb-1">{mat.title}</h4>
-                                    <p className="text-[11px] text-gray-500 leading-relaxed">{mat.desc}</p>
+                                    <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{mat.desc}</p>
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    <Button variant="outline" size="sm" className="flex-1 border-white/10 text-gray-400 hover:text-white hover:bg-white/[0.06] text-xs">
+                                    <Button variant="outline" size="sm" className="flex-1 border-slate-200 dark:border-white/10 text-gray-400 hover:text-white hover:bg-white/[0.06] text-xs">
                                         <Eye className="h-3 w-3 mr-1" /> Preview
                                     </Button>
                                     <Button size="sm" className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs">
@@ -365,20 +365,20 @@ export default function AfiliadosPage() {
                     <div className="rounded-xl bg-gradient-to-r from-violet-600/10 to-fuchsia-600/5 border border-violet-500/10 p-6 space-y-4">
                         <div className="flex items-center gap-2">
                             <Send className="h-5 w-5 text-fuchsia-400" />
-                            <h3 className="text-sm font-bold text-white">Formulário de Cadastro de Afiliados</h3>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Formulário de Cadastro de Afiliados</h3>
                         </div>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-slate-500 dark:text-gray-400">
                             Envie este link para a sua base de clientes. Quem preencher o formulário entra como afiliado e já recebe o link de divulgação personalizado.
                         </p>
                         <div className="flex gap-2 max-w-2xl">
                             <Input
                                 readOnly
                                 value={formLink}
-                                className="bg-[#0d0f1a] border-white/[0.06] text-white font-mono text-sm h-11"
+                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white font-mono text-sm h-11"
                             />
                             <Button
                                 onClick={() => handleCopy(formLink, setCopiedForm)}
-                                className={`shrink-0 h-11 px-5 ${copiedForm ? "bg-violet-600 text-white" : "bg-white/[0.06] text-gray-300 hover:bg-white/10"}`}
+                                className={`shrink-0 h-11 px-5 ${copiedForm ? "bg-violet-600 text-white" : "bg-white/[0.06] text-slate-700 dark:text-gray-300 hover:bg-white/10"}`}
                             >
                                 {copiedForm ? <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Copiado!</> : <><Copy className="h-4 w-4 mr-1.5" /> Copiar</>}
                             </Button>
@@ -386,7 +386,7 @@ export default function AfiliadosPage() {
                     </div>
 
                     {/* How it works */}
-                    <div className="rounded-xl bg-[#12142a] border border-white/[0.06] p-6">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
                         <h3 className="text-sm font-bold text-white mb-4">Como Funciona a Afiliação</h3>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             {[
@@ -395,22 +395,22 @@ export default function AfiliadosPage() {
                                 { step: "3", title: "Afiliado divulga", desc: "O afiliado compartilha o link e cada venda gerada é rastreada automaticamente.", icon: Share2 },
                                 { step: "4", title: "Comissão automática", desc: "As comissões são calculadas e creditadas na carteira. Você e o afiliado ganham!", icon: Gift },
                             ].map((item) => (
-                                <div key={item.step} className="text-center p-4 rounded-xl bg-[#0d0f1a] border border-white/[0.06]">
+                                <div key={item.step} className="text-center p-4 rounded-xl bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06]">
                                     <div className="w-10 h-10 rounded-full bg-violet-600/20 flex items-center justify-center mx-auto mb-3">
                                         <item.icon className="h-4 w-4 text-violet-400" />
                                     </div>
                                     <span className="text-[10px] text-violet-400 font-bold uppercase tracking-wider">Passo {item.step}</span>
                                     <p className="text-sm font-semibold text-white mt-1 mb-1">{item.title}</p>
-                                    <p className="text-[11px] text-gray-500 leading-relaxed">{item.desc}</p>
+                                    <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{item.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Quick Share Buttons */}
-                    <div className="rounded-xl bg-[#12142a] border border-white/[0.06] p-6">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
                         <h3 className="text-sm font-bold text-white mb-3">Compartilhar Formulário</h3>
-                        <p className="text-xs text-gray-500 mb-4">Envie o convite diretamente por estes canais:</p>
+                        <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">Envie o convite diretamente por estes canais:</p>
                         <div className="flex flex-wrap gap-3">
                             <a
                                 href={`https://wa.me/?text=${encodeURIComponent(`Quer ganhar comissões divulgando nossos serviços? Cadastre-se no nosso programa de afiliados: ${formLink}`)}`}

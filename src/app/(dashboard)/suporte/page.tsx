@@ -8,8 +8,8 @@ export default function SuportePage() {
                     <Headset className="h-6 w-6" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Suporte</h1>
-                    <p className="text-sm text-gray-500">Entre em contato com nossa equipe</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Suporte</h1>
+                    <p className="text-sm text-slate-500 dark:text-gray-500">Entre em contato com nossa equipe</p>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@ export default function SuportePage() {
                         <MessageCircle className="h-6 w-6 text-emerald-400" />
                     </div>
                     <h3 className="text-sm font-semibold text-white mb-2">Chat ao Vivo</h3>
-                    <p className="text-xs text-gray-500 mb-4">
+                    <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">
                         Fale com um atendente em tempo real durante o horário comercial.
                     </p>
                     <button className="w-full px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors">
@@ -32,7 +32,7 @@ export default function SuportePage() {
                         <Mail className="h-6 w-6 text-blue-400" />
                     </div>
                     <h3 className="text-sm font-semibold text-white mb-2">E-mail</h3>
-                    <p className="text-xs text-gray-500 mb-4">
+                    <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">
                         Envie sua dúvida por e-mail e responderemos em até 24h úteis.
                     </p>
                     <a
@@ -48,7 +48,7 @@ export default function SuportePage() {
                         <FileQuestion className="h-6 w-6 text-violet-400" />
                     </div>
                     <h3 className="text-sm font-semibold text-white mb-2">Base de Conhecimento</h3>
-                    <p className="text-xs text-gray-500 mb-4">
+                    <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">
                         Consulte tutoriais, FAQs e guias de uso da plataforma.
                     </p>
                     <button className="w-full px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium transition-colors">
@@ -65,7 +65,7 @@ export default function SuportePage() {
                         <input
                             type="text"
                             placeholder="Descreva brevemente o problema"
-                            className="w-full px-3 py-2.5 rounded-lg bg-[#111] border border-white/10 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
+                            className="w-full px-3 py-2.5 rounded-lg bg-[#111] border border-slate-200 dark:border-white/10 text-sm text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50"
                         />
                     </div>
                     <div>
@@ -73,7 +73,7 @@ export default function SuportePage() {
                         <textarea
                             rows={4}
                             placeholder="Detalhe sua dúvida ou problema..."
-                            className="w-full px-3 py-2.5 rounded-lg bg-[#111] border border-white/10 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+                            className="w-full px-3 py-2.5 rounded-lg bg-[#111] border border-slate-200 dark:border-white/10 text-sm text-white placeholder:text-slate-400 dark:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
                         />
                     </div>
                     <button

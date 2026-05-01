@@ -31,7 +31,7 @@ export default async function DashboardLayout({
                     userEmail={user.email}
                     userName={user.user_metadata?.full_name}
                 />
-                <main className="flex-1 overflow-y-auto bg-[#0a0c16] p-6">
+                <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0a0c16] p-6 text-slate-900 dark:text-white">
                     {children}
                 </main>
             </div>

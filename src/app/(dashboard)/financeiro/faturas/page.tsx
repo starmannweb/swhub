@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import {
     Plus, Search, Filter,
     MoreHorizontal, Calendar,
@@ -18,6 +19,9 @@ export default function FaturasPage() {
     const [faturas, setFaturas] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState<string | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [contacts, setContacts] = useState<any[]>([])
+    const [newFatura, setNewFatura] = useState({ description: "", amount: "", contactId: "" })
 
     useEffect(() => {
         fetchFaturas()
@@ -41,37 +45,30 @@ export default function FaturasPage() {
         if (!error && data) {
             setFaturas(data)
         }
+
+        const { data: contactsData } = await supabase.from('crm_contacts').select('id, name').eq('user_id', userAuth.user.id)
+        if (contactsData) setContacts(contactsData)
+
         setLoading(false)
     }
 
     async function handleAddFatura() {
-        alert("Para gerar uma fatura precisamos selecionar um Cliente (Contato). Como estamos num MVP sem modal complexo, simular gerando uma fatura PIX pro contato genérico.");
+        if (!newFatura.contactId || !newFatura.description || !newFatura.amount) {
+            alert("Preencha todos os campos")
+            return
+        }
 
         const { data: userAuth } = await supabase.auth.getUser()
         if (!userAuth.user) return
-
-        // Procura um contato pra vincular
-        const { data: contatos } = await supabase.from('crm_contacts').select('id').eq('user_id', userAuth.user.id).limit(1)
-
-        if (!contatos || contatos.length === 0) {
-            alert("Aviso: Crie um Contato/Lead no CRM antes de gerar faturas.")
-            return;
-        }
-
-        const description = prompt("Descrição / Serviço da Fatura:");
-        if (!description) return;
-
-        const amountStr = prompt("Valor em Reais (ex: 1500.00):");
-        if (!amountStr) return;
 
         const { data, error } = await supabase
             .from('crm_invoices')
             .insert({
                 user_id: userAuth.user.id,
-                contact_id: contatos[0].id,
-                description: description,
+                contact_id: newFatura.contactId,
+                description: newFatura.description,
                 status: 'pending',
-                amount: parseFloat(amountStr),
+                amount: parseFloat(newFatura.amount),
                 payment_method: 'pix',
                 pix_code: '00020126580014BR.GOV.BCB.PIX0136hub-pix-key-ficticia52040000530398654051500.005802BR5915HUB Pagamentos6009SAO PAULO62140510HUBFATURA26304ED1A',
                 due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -81,6 +78,10 @@ export default function FaturasPage() {
 
         if (!error && data) {
             setFaturas([data, ...faturas])
+            setIsModalOpen(false)
+            setNewFatura({ description: "", amount: "", contactId: "" })
+        } else {
+            alert("Erro ao criar fatura")
         }
     }
 
@@ -135,12 +136,12 @@ export default function FaturasPage() {
                         />
                     </div>
                     <Button variant="outline" size="icon"><Filter className="h-4 w-4" /></Button>
-                    <Button onClick={handleAddFatura} className="bg-emerald-600 hover:bg-emerald-700"><Plus className="mr-2 h-4 w-4" /> Nova Cobrança</Button>
+                    <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700"><Plus className="mr-2 h-4 w-4" /> Nova Cobrança</Button>
                 </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border-l-4 border-l-emerald-500 shadow-sm bg-[#12142a] border-y border-r border-white/[0.06]">
+                <Card className="border-l-4 border-l-emerald-500 shadow-sm bg-white dark:bg-[#12142a] border-y border-r border-slate-200 dark:border-white/[0.06]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Caixa Recebido</CardTitle>
                         <ShieldCheck className="h-4 w-4 text-emerald-500" />
@@ -150,13 +151,13 @@ export default function FaturasPage() {
                         <p className="text-xs text-gray-500 mt-1">Total de Faturas Pagas</p>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-amber-500 shadow-sm bg-[#12142a] border-y border-r border-white/[0.06]">
+                <Card className="border-l-4 border-l-amber-500 shadow-sm bg-white dark:bg-[#12142a] border-y border-r border-slate-200 dark:border-white/[0.06]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">A Receber</CardTitle>
                         <Clock className="h-4 w-4 text-amber-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{formatCurrency(getTotalPendente())}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{formatCurrency(getTotalPendente())}</div>
                         <p className="text-xs text-gray-500 mt-1">Aguardando Pagamento</p>
                     </CardContent>
                 </Card>
@@ -177,7 +178,7 @@ export default function FaturasPage() {
                         const isOverdue = fatura.status === 'overdue'
 
                         return (
-                            <Card key={fatura.id} className={`overflow-hidden transition-all border ${isPaid ? 'border-emerald-500/30 bg-emerald-950/20' : isOverdue ? 'border-red-500/50 bg-[#12142a]' : 'border-white/[0.06] hover:border-violet-500/50 bg-[#12142a]'} shadow-sm flex flex-col text-white`}>
+                            <Card key={fatura.id} className={`overflow-hidden transition-all border ${isPaid ? 'border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/20' : isOverdue ? 'border-red-500/50 bg-white dark:bg-[#12142a]' : 'border-slate-200 dark:border-white/[0.06] hover:border-violet-500/50 bg-white dark:bg-[#12142a]'} shadow-sm flex flex-col text-slate-900 dark:text-white`}>
                                 <CardHeader className="pb-2">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-2">
@@ -194,7 +195,7 @@ export default function FaturasPage() {
                                     <CardDescription>{fatura.crm_contacts?.name || 'Cliente Removido'}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex-1 pb-4">
-                                    <h3 className={`text-3xl font-bold tracking-tight mb-4 ${isPaid ? 'text-emerald-400' : 'text-white'}`}>
+                                    <h3 className={`text-3xl font-bold tracking-tight mb-4 ${isPaid ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>
                                         {formatCurrency(fatura.amount)}
                                     </h3>
 
@@ -229,7 +230,7 @@ export default function FaturasPage() {
                                         </div>
                                     )}
                                 </CardContent>
-                                <div className={`p-3 text-xs border-t border-white/[0.06] mt-auto flex justify-between items-center ${isPaid ? 'bg-emerald-500/10' : 'bg-white/[0.02]'}`}>
+                                <div className={`p-3 text-xs border-t border-slate-200 dark:border-white/[0.06] mt-auto flex justify-between items-center ${isPaid ? 'bg-emerald-500/10' : 'bg-slate-50 dark:bg-white/[0.02]'}`}>
                                     <span className="text-muted-foreground flex items-center gap-1">
                                         {isPaid ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clock className="w-3.5 h-3.5" />}
                                         {isPaid ? `Pago em ${new Date(fatura.paid_at).toLocaleDateString()}` : 'Aguardando Cliente'}
@@ -248,6 +249,55 @@ export default function FaturasPage() {
                     })
                 )}
             </div>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="sm:max-w-[425px] bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/10">
+                    <DialogHeader>
+                        <DialogTitle className="text-slate-900 dark:text-white">Nova Cobrança</DialogTitle>
+                        <DialogDescription className="text-slate-500 dark:text-gray-400">
+                            Gere uma nova fatura com código PIX automático.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Cliente</label>
+                            <select 
+                                className="flex h-10 w-full rounded-md border border-slate-200 dark:border-white/10 bg-transparent px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={newFatura.contactId}
+                                onChange={e => setNewFatura({...newFatura, contactId: e.target.value})}
+                            >
+                                <option value="" className="bg-white dark:bg-[#12142a]">Selecione um cliente...</option>
+                                {contacts.map(c => (
+                                    <option key={c.id} value={c.id} className="bg-white dark:bg-[#12142a]">{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Descrição do Serviço</label>
+                            <Input 
+                                placeholder="Ex: Criação de Site Institucional" 
+                                className="bg-white dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+                                value={newFatura.description}
+                                onChange={e => setNewFatura({...newFatura, description: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Valor Total (R$)</label>
+                            <Input 
+                                type="number" 
+                                placeholder="1500.00" 
+                                className="bg-white dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white"
+                                value={newFatura.amount}
+                                onChange={e => setNewFatura({...newFatura, amount: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsModalOpen(false)} className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-300">Cancelar</Button>
+                        <Button onClick={handleAddFatura} className="bg-emerald-600 hover:bg-emerald-700 text-white">Gerar Cobrança</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

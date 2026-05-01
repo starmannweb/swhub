@@ -34,6 +34,8 @@ interface NavItem {
     title: string
     href: string
     icon: LucideIcon
+    adminOnly?: boolean
+    external?: boolean
 }
 
 interface NavSection {
@@ -42,6 +44,7 @@ interface NavSection {
     href?: string
     items?: NavItem[]
     adminOnly?: boolean
+    external?: boolean
 }
 
 const navigation: NavSection[] = [
@@ -68,10 +71,7 @@ const navigation: NavSection[] = [
     {
         title: "Projetos",
         icon: Briefcase,
-        items: [
-            { title: "Painel de Projetos", href: "/colaboracao/projetos", icon: Briefcase },
-            { title: "Tarefas", href: "/colaboracao/tarefas", icon: CheckSquare },
-        ],
+        href: "/colaboracao/projetos",
     },
     {
         title: "Criar Site",
@@ -94,11 +94,6 @@ const navigation: NavSection[] = [
         href: "/treinamentos",
     },
     {
-        title: "Comunidade",
-        icon: MessageCircle,
-        href: "/comunidade",
-    },
-    {
         title: "Financeiro",
         icon: CreditCard,
         href: "/financeiro/faturas",
@@ -109,24 +104,9 @@ const navigation: NavSection[] = [
         href: "/relatorios",
     },
     {
-        title: "Materiais",
-        icon: Download,
-        href: "/materiais",
-    },
-    {
         title: "Suporte",
         icon: Headset,
         href: "/suporte",
-    },
-    {
-        title: "Admin",
-        icon: ShieldCheck,
-        adminOnly: true,
-        items: [
-            { title: "Painel Admin", href: "/admin", icon: ShieldCheck },
-            { title: "Modelos de Sites", href: "/admin/modelos", icon: LayoutTemplate },
-            { title: "Materiais de Apoio", href: "/admin/materiais", icon: Download },
-        ],
     },
     {
         title: "Configurações",
@@ -156,24 +136,24 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
 
     return (
         <aside className={cn(
-            "hidden md:flex h-screen flex-col bg-[#0d0f1a] overflow-y-auto transition-all duration-300 ease-in-out z-40 border-r border-white/[0.06]",
+            "hidden md:flex h-screen flex-col bg-white dark:bg-[#0d0f1a] overflow-y-auto transition-all duration-300 ease-in-out z-40 border-r border-slate-200 dark:border-white/[0.06]",
             isCollapsed ? "w-[72px]" : "w-64"
         )}>
             {/* Header - Logo & Toggle */}
-            <div className="flex shrink-0 items-center justify-between px-4 py-5 sticky top-0 bg-[#0d0f1a] z-10">
+            <div className="flex shrink-0 items-center justify-between px-4 py-5 sticky top-0 bg-white dark:bg-[#0d0f1a] z-10">
                 <div className={cn("flex items-center gap-3 overflow-hidden", isCollapsed && "w-0 opacity-0")}>
                     <div className="flex shrink-0 h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 shadow-lg shadow-violet-900/30">
                         <span className="text-sm font-bold text-white">S</span>
                     </div>
                     <div className="min-w-0">
-                        <p className="text-sm font-bold text-white truncate tracking-wide">SWHub</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white truncate tracking-wide">SWHub</p>
                         <p className="text-[10px] text-gray-500 font-medium">v0.5.0</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
                     className={cn(
-                        "p-1.5 rounded-md hover:bg-white/10 text-gray-500 hover:text-white transition-colors shrink-0",
+                        "p-1.5 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-900 dark:hover:bg-white/10 dark:text-gray-500 dark:hover:text-white transition-colors shrink-0",
                         isCollapsed && "mx-auto"
                     )}
                     title={isCollapsed ? "Expandir" : "Recolher"}
@@ -201,8 +181,8 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                         className={cn(
                                             "flex items-center w-full rounded-xl transition-colors",
                                             active
-                                                ? "text-violet-400"
-                                                : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200",
+                                                ? "text-violet-600 dark:text-violet-400"
+                                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-gray-200",
                                             isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                         )}
                                     >
@@ -219,21 +199,25 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                                     </button>
 
                                     {!isCollapsed && isExpanded && (
-                                        <div className="ml-4 mt-0.5 space-y-0.5 border-l border-violet-500/10 pl-3">
-                                            {section.items!.map((item) => {
+                                        <div className="ml-5 mt-1 space-y-1 border-l border-slate-200 dark:border-white/10">
+                                            {section.items!.filter(item => !item.adminOnly || isAdmin).map((item) => {
                                                 const itemActive = isItemActive(item.href)
                                                 return (
                                                     <Link
                                                         key={item.href}
                                                         href={item.href}
+                                                        target={item.external ? "_blank" : undefined}
                                                         className={cn(
-                                                            "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
+                                                            "flex items-center gap-3 px-4 py-2 text-[13px] font-medium transition-all relative",
                                                             itemActive
-                                                                ? "text-white bg-violet-600/20"
-                                                                : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.04]"
+                                                                ? "text-violet-600 dark:text-violet-400 bg-slate-50 dark:bg-white/[0.02]"
+                                                                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/[0.02]"
                                                         )}
                                                     >
-                                                        <item.icon className="h-4 w-4 shrink-0" />
+                                                        {itemActive && (
+                                                            <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-violet-600 dark:bg-violet-400 rounded-r-full" />
+                                                        )}
+                                                        <item.icon className="h-[14px] w-[14px] shrink-0" />
                                                         <span className="whitespace-nowrap">{item.title}</span>
                                                     </Link>
                                                 )
@@ -248,16 +232,17 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
                             <Link
                                 key={section.title}
                                 href={section.href!}
+                                target={section.external ? "_blank" : undefined}
                                 title={isCollapsed ? section.title : undefined}
                                 className={cn(
                                     "flex items-center rounded-xl transition-colors",
                                     active
-                                        ? "text-white bg-gradient-to-r from-violet-600/30 to-violet-700/10 shadow-sm"
-                                        : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200",
+                                        ? "text-violet-700 bg-violet-50 dark:text-white dark:bg-gradient-to-r dark:from-violet-600/30 dark:to-violet-700/10 shadow-sm"
+                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-gray-200",
                                     isCollapsed ? "justify-center p-2.5 mx-auto w-10 h-10" : "gap-3 px-3 py-2.5 text-sm font-medium"
                                 )}
                             >
-                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-400")} />
+                                <section.icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-violet-600 dark:text-violet-400")} />
                                 {!isCollapsed && <span className="whitespace-nowrap">{section.title}</span>}
                             </Link>
                         )
@@ -266,7 +251,7 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
             </nav>
 
             {/* Footer */}
-            <div className="border-t border-white/[0.06] p-4 shrink-0 mt-auto sticky bottom-0 bg-[#0d0f1a] overflow-hidden">
+            <div className="border-t border-slate-200 dark:border-white/[0.06] p-4 shrink-0 mt-auto sticky bottom-0 bg-white dark:bg-[#0d0f1a] overflow-hidden">
                 {!isCollapsed ? (
                     <p className="text-[11px] text-gray-600 text-center whitespace-nowrap">
                         SWHub v0.5.0

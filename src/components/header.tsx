@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Bell } from "lucide-react"
+import { LogOut, User, Bell, MessageCircle } from "lucide-react"
 
 interface HeaderProps {
     userEmail?: string
@@ -42,12 +42,17 @@ export function Header({ userEmail, userName }: HeaderProps) {
             : "U"
 
     return (
-        <header className="flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0f1a] px-6">
+        <header className="flex h-14 items-center justify-between border-b border-slate-200 dark:border-white/[0.06] bg-white dark:bg-[#0d0f1a] px-6">
             <div />
 
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-white hover:bg-white/[0.06]">
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.06]">
                     <Bell className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/[0.06]" asChild>
+                    <a href="https://discord.gg/seu-link-aqui" target="_blank" rel="noopener noreferrer" title="Comunidade Discord">
+                        <MessageCircle className="h-4 w-4" />
+                    </a>
                 </Button>
 
                 <ThemeToggle />

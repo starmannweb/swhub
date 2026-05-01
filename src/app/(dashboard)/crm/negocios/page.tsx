@@ -241,20 +241,20 @@ export default function CrmDealsPage() {
             <div className="flex-none px-4 md:px-8 pt-6 pb-4 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-white">CRM — Negócios</h2>
-                        <p className="text-sm text-gray-500">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">CRM — Negócios</h2>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">
                             Pipeline: {pipeline?.name || 'Comercial'} · {deals.length} negócio{deals.length !== 1 ? 's' : ''} ativo{deals.length !== 1 ? 's' : ''}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         {/* View Toggle */}
-                        <div className="flex items-center rounded-lg border border-white/10 bg-[#1e1e1e] p-0.5">
+                        <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-[#1e1e1e] p-0.5">
                             <button
                                 onClick={() => setViewMode('kanban')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                                     viewMode === 'kanban'
                                         ? 'bg-violet-500/20 text-violet-400'
-                                        : 'text-gray-500 hover:text-gray-300'
+                                        : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'
                                 }`}
                             >
                                 <KanbanSquare className="h-3.5 w-3.5" /> Kanban
@@ -264,7 +264,7 @@ export default function CrmDealsPage() {
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                                     viewMode === 'list'
                                         ? 'bg-violet-500/20 text-violet-400'
-                                        : 'text-gray-500 hover:text-gray-300'
+                                        : 'text-slate-500 dark:text-gray-500 hover:text-slate-700 dark:text-gray-300'
                                 }`}
                             >
                                 <LayoutList className="h-3.5 w-3.5" /> Lista
@@ -287,12 +287,12 @@ export default function CrmDealsPage() {
                         const total = deals.filter(d => d.stage_id === stage.id).reduce((s, d) => s + (d.value || 0), 0)
                         const colorClass = stageColorsDot[stage.color || 'blue'] || 'bg-blue-400'
                         return (
-                            <div key={stage.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#12142a] border border-white/[0.06] min-w-fit">
+                            <div key={stage.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] min-w-fit">
                                 <div className={`h-2 w-2 rounded-full ${colorClass}`} />
                                 <span className="text-xs text-gray-400 font-medium">{stage.name}</span>
                                 <span className="text-xs text-white font-bold">{count}</span>
-                                <span className="text-[10px] text-gray-600">·</span>
-                                <span className="text-[10px] text-gray-500">{formatCurrency(total)}</span>
+                                <span className="text-[10px] text-slate-400 dark:text-gray-600">·</span>
+                                <span className="text-[10px] text-slate-500 dark:text-gray-500">{formatCurrency(total)}</span>
                             </div>
                         )
                     })}
@@ -311,7 +311,7 @@ export default function CrmDealsPage() {
                             return (
                                 <div
                                     key={stage.id}
-                                    className="flex flex-col flex-none w-[300px] max-h-full rounded-xl bg-[#12142a] border border-white/[0.06]"
+                                    className="flex flex-col flex-none w-[300px] max-h-full rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06]"
                                     onDragOver={handleDragOver}
                                     onDrop={(e) => handleDrop(e, stage.id)}
                                 >
@@ -319,18 +319,18 @@ export default function CrmDealsPage() {
                                     <div className="p-3 pb-2 flex items-center justify-between shrink-0">
                                         <div className="flex items-center gap-2">
                                             <div className={`h-2.5 w-2.5 rounded-full ${colorClass}`} />
-                                            <h3 className="font-semibold text-sm text-white">{stage.name}</h3>
+                                            <h3 className="font-semibold text-sm text-slate-900 dark:text-white">{stage.name}</h3>
                                             <span className="text-[10px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded-full font-medium">
                                                 {stageDeals.length}
                                             </span>
                                         </div>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 text-gray-600 hover:text-gray-300">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 text-slate-400 dark:text-gray-600 hover:text-slate-700 dark:text-gray-300">
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </div>
 
                                     <div className="px-3 pb-2 shrink-0">
-                                        <span className="text-[10px] text-gray-600 font-medium">
+                                        <span className="text-[10px] text-slate-400 dark:text-gray-600 font-medium">
                                             Total: {formatCurrency(stageTotal)}
                                         </span>
                                     </div>
@@ -343,12 +343,12 @@ export default function CrmDealsPage() {
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, deal.id)}
                                                 onDragEnd={handleDragEnd}
-                                                className="group cursor-grab active:cursor-grabbing rounded-lg bg-[#1a1f3a] border border-white/[0.06] p-3 hover:border-violet-500/30 transition-all duration-200"
+                                                className="group cursor-grab active:cursor-grabbing rounded-lg bg-[#1a1f3a] border border-slate-200 dark:border-white/[0.06] p-3 hover:border-violet-500/30 transition-all duration-200"
                                             >
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="space-y-1 pr-2 min-w-0">
                                                         <p className="text-sm font-semibold text-white leading-tight truncate">{deal.title}</p>
-                                                        <p className="text-[11px] text-gray-500">
+                                                        <p className="text-[11px] text-slate-500 dark:text-gray-500">
                                                             {deal.contact_id ? 'Contato vinculado' : 'Sem contato'}
                                                         </p>
                                                     </div>
@@ -367,7 +367,7 @@ export default function CrmDealsPage() {
                                                                 {sourceLabels[deal.source].label}
                                                             </span>
                                                         )}
-                                                        <span className="flex items-center gap-1 text-gray-600">
+                                                        <span className="flex items-center gap-1 text-slate-400 dark:text-gray-600">
                                                             <Calendar className="h-3 w-3" />
                                                             {new Date(deal.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                                                         </span>
@@ -381,7 +381,7 @@ export default function CrmDealsPage() {
                                     <div className="p-3 pt-1 shrink-0">
                                         <button
                                             onClick={() => handleQuickAdd(stage.id)}
-                                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-white/5 text-xs font-medium transition-colors"
+                                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-400 dark:text-gray-600 hover:text-slate-700 dark:text-gray-300 hover:bg-white/5 text-xs font-medium transition-colors"
                                         >
                                             <Plus className="h-3 w-3" /> Adicionar
                                         </button>
@@ -391,7 +391,7 @@ export default function CrmDealsPage() {
                         })}
 
                         <div className="flex-none w-[280px] shrink-0">
-                            <button className="w-full border border-dashed border-white/10 rounded-xl h-12 text-gray-600 hover:text-gray-400 hover:border-white/20 text-xs font-medium transition-colors flex items-center justify-center gap-2">
+                            <button className="w-full border border-dashed border-slate-200 dark:border-white/10 rounded-xl h-12 text-slate-400 dark:text-gray-600 hover:text-gray-400 hover:border-white/20 text-xs font-medium transition-colors flex items-center justify-center gap-2">
                                 <Plus className="h-3.5 w-3.5" /> Novo Estágio
                             </button>
                         </div>
@@ -402,9 +402,9 @@ export default function CrmDealsPage() {
             {/* List View */}
             {viewMode === 'list' && (
                 <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-8 pt-2">
-                    <div className="rounded-xl bg-[#12142a] border border-white/[0.06] overflow-hidden">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden">
                         {/* Table Header */}
-                        <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider border-b border-white/[0.06] bg-[#0d0f1a]">
+                        <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a]">
                             <div className="col-span-4">Negócio</div>
                             <div className="col-span-2">Estágio</div>
                             <div className="col-span-2 text-right">Valor</div>
@@ -414,7 +414,7 @@ export default function CrmDealsPage() {
 
                         {/* Rows */}
                         {deals.length === 0 ? (
-                            <div className="flex items-center justify-center py-16 text-gray-600 text-sm">
+                            <div className="flex items-center justify-center py-16 text-slate-400 dark:text-gray-600 text-sm">
                                 Nenhum negócio ativo. Crie o primeiro acima.
                             </div>
                         ) : (
@@ -424,16 +424,16 @@ export default function CrmDealsPage() {
                                     const colorClass = stageColorsDot[stage?.color || 'blue'] || 'bg-blue-400'
 
                                     return (
-                                        <div key={deal.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                                        <div key={deal.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group cursor-pointer">
                                             <div className="col-span-4">
                                                 <p className="text-sm font-semibold text-white truncate">{deal.title}</p>
-                                                <p className="text-[11px] text-gray-600 mt-0.5">
+                                                <p className="text-[11px] text-slate-400 dark:text-gray-600 mt-0.5">
                                                     {deal.contact_id ? 'Contato vinculado' : 'Sem contato'}
                                                 </p>
                                             </div>
 
                                             <div className="col-span-2">
-                                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-300">
+                                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-gray-300">
                                                     <div className={`h-2 w-2 rounded-full ${colorClass}`} />
                                                     {stage?.name || '—'}
                                                 </span>
@@ -456,7 +456,7 @@ export default function CrmDealsPage() {
                                                 )}
                                             </div>
 
-                                            <div className="col-span-2 text-right text-xs text-gray-500">
+                                            <div className="col-span-2 text-right text-xs text-slate-500 dark:text-gray-500">
                                                 {new Date(deal.created_at).toLocaleDateString('pt-BR')}
                                             </div>
                                         </div>
