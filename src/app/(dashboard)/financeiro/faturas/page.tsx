@@ -117,7 +117,7 @@ export default function FaturasPage() {
     const getTotalRecebido = () => faturas.filter(f => f.status === 'paid').reduce((acc, curr) => acc + Number(curr.amount), 0);
 
     return (
-        <div className="flex-1 space-y-6 pt-6 px-4 md:px-8 max-w-7xl mx-auto w-full mb-10">
+        <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">

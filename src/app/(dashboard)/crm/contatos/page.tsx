@@ -65,13 +65,17 @@ export default function CrmContactsPage() {
     }
 
     return (
-        <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 max-w-7xl mx-auto w-full">
-            <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Leads e Clientes</h2>
-                    <p className="text-slate-500 dark:text-gray-400">
-                        Liste e gerencie sua base de contatos.
-                    </p>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
+                        <Users className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Leads e Clientes</h1>
+                        <p className="text-sm text-slate-500 dark:text-gray-500">Liste e gerencie sua base de contatos.</p>
+                    </div>
                 </div>
                 <div className="flex items-center space-x-2 w-full sm:w-auto">
                     <div className="relative w-full sm:w-64">

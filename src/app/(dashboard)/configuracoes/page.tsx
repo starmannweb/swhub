@@ -223,7 +223,7 @@ export default function ConfiguracoesPage() {
 
             {/* Meus Dados Tab */}
             {tab === "conta" && (
-                <div className="space-y-6 max-w-2xl">
+                <div className="space-y-6 max-w-4xl">
                     <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
                         <h2 className="text-sm font-bold text-slate-900 dark:text-white">Informações Pessoais</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

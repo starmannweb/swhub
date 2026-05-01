@@ -239,12 +239,17 @@ export default function CrmDealsPage() {
         <div className="flex flex-col h-[calc(100vh-theme(spacing.16))]">
             {/* Header */}
             <div className="flex-none px-4 md:px-8 pt-6 pb-4 space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">CRM — Negócios</h2>
-                        <p className="text-sm text-slate-500 dark:text-gray-500">
-                            Pipeline: {pipeline?.name || 'Comercial'} · {deals.length} negócio{deals.length !== 1 ? 's' : ''} ativo{deals.length !== 1 ? 's' : ''}
-                        </p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-violet-500/20 text-violet-400">
+                            <KanbanSquare className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">CRM — Negócios</h1>
+                            <p className="text-sm text-slate-500 dark:text-gray-500">
+                                Pipeline: {pipeline?.name || 'Comercial'} · {deals.length} negócio{deals.length !== 1 ? 's' : ''} ativo{deals.length !== 1 ? 's' : ''}
+                            </p>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         {/* View Toggle */}
