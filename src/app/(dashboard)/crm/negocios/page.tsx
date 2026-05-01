@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Plus, MoreHorizontal,
     DollarSign, Loader2, Calendar, GripVertical,
-    LayoutList, KanbanSquare, Megaphone, Globe, Search, Zap, MessageSquare, HelpCircle,
+    LayoutList, KanbanSquare, Megaphone, Globe, Search, MessageSquare, HelpCircle,
 } from "lucide-react"
 
 import type { CrmPipeline, CrmPipelineStage, CrmDeal, CrmDealStatus, CrmLeadSource } from "@/types/crm"
@@ -33,12 +35,55 @@ const sourceIcon: Record<string, React.ReactNode> = {
     outro: <HelpCircle className="h-3 w-3" />,
 }
 
+type ContactOption = {
+    id: string
+    name: string
+    company: string | null
+}
+
+type DealFormState = {
+    title: string
+    value: string
+    stageId: string
+    contactId: string
+    source: Exclude<CrmLeadSource, null> | "none"
+}
+
+const NO_CONTACT_VALUE = "none"
+const NO_SOURCE_VALUE = "none"
+
+const dealSourceOptions: { value: Exclude<CrmLeadSource, null>; label: string }[] = [
+    { value: "ads", label: "Ads" },
+    { value: "indicacao", label: "Indicação" },
+    { value: "organico", label: "Orgânico" },
+    { value: "whatsapp", label: "WhatsApp" },
+    { value: "site", label: "Site" },
+    { value: "outro", label: "Outro" },
+]
+
+function parseMoneyInput(value: string) {
+    const normalized = value.replace(/\./g, "").replace(",", ".")
+    const parsed = Number.parseFloat(normalized)
+    return Number.isFinite(parsed) ? parsed : 0
+}
+
 export default function CrmDealsPage() {
     const [loading, setLoading] = useState(true)
     const [pipeline, setPipeline] = useState<CrmPipeline | null>(null)
     const [stages, setStages] = useState<CrmPipelineStage[]>([])
     const [deals, setDeals] = useState<CrmDeal[]>([])
+    const [contacts, setContacts] = useState<ContactOption[]>([])
     const [viewMode, setViewMode] = useState<ViewMode>('kanban')
+    const [isDealDialogOpen, setIsDealDialogOpen] = useState(false)
+    const [savingDeal, setSavingDeal] = useState(false)
+    const [dealError, setDealError] = useState("")
+    const [dealForm, setDealForm] = useState<DealFormState>({
+        title: "",
+        value: "",
+        stageId: "",
+        contactId: NO_CONTACT_VALUE,
+        source: NO_SOURCE_VALUE,
+    })
 
     const [draggedDealId, setDraggedDealId] = useState<string | null>(null)
 
@@ -98,6 +143,15 @@ export default function CrmDealsPage() {
 
             if (deals_data) setDeals(deals_data)
 
+            const { data: contacts_data } = await supabase
+                .from('crm_contacts')
+                .select('id, name, company')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(100)
+
+            if (contacts_data) setContacts(contacts_data)
+
         } catch (error) {
             console.error("Pipeline load error:", error)
         } finally {
@@ -149,12 +203,11 @@ export default function CrmDealsPage() {
             return
         }
 
-        // Auto-create proposal when deal moves to a "Proposta" stage
+        // Auto-create a draft proposal when a linked deal reaches a proposal stage.
         const targetStage = stages.find(s => s.id === targetStageId)
-        if (targetStage && targetStage.name.toLowerCase().includes('proposta')) {
+        if (targetStage && targetStage.name.toLowerCase().includes('proposta') && dealToMove.contact_id) {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
-                // Check if proposal already exists for this deal
                 const { data: existing } = await supabase
                     .from('crm_proposals')
                     .select('id')
@@ -166,29 +219,60 @@ export default function CrmDealsPage() {
                         user_id: user.id,
                         title: `Proposta — ${dealToMove.title}`,
                         status: 'draft',
-                        total: dealToMove.value || 0,
+                        contact_id: dealToMove.contact_id,
+                        total_value: dealToMove.value || 0,
                         deal_id: draggedDealId,
+                        valid_until: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
                     })
                 }
             }
         }
     }
 
-    const handleQuickAdd = async (stageId: string) => {
-        const title = prompt("Nome do negócio ou empresa:")
-        if (!title || !pipeline) return
+    const openDealDialog = (stageId?: string) => {
+        setDealForm({
+            title: "",
+            value: "",
+            stageId: stageId || stages[0]?.id || "",
+            contactId: NO_CONTACT_VALUE,
+            source: NO_SOURCE_VALUE,
+        })
+        setDealError("")
+        setIsDealDialogOpen(true)
+    }
 
+    const handleCreateDeal = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        setDealError("")
+
+        const title = dealForm.title.trim()
+        if (!title) {
+            setDealError("Informe o nome do negócio.")
+            return
+        }
+
+        if (!pipeline || !dealForm.stageId) {
+            setDealError("Crie ou selecione um estágio do pipeline antes de adicionar o negócio.")
+            return
+        }
+
+        setSavingDeal(true)
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
+        if (!user) {
+            setSavingDeal(false)
+            return
+        }
 
         const newDeal = {
             user_id: user.id,
             pipeline_id: pipeline.id,
-            stage_id: stageId,
-            title: title,
+            stage_id: dealForm.stageId,
+            contact_id: dealForm.contactId === NO_CONTACT_VALUE ? null : dealForm.contactId,
+            source: dealForm.source === NO_SOURCE_VALUE ? null : dealForm.source,
+            title,
             status: 'open' as CrmDealStatus,
-            value: 0
+            value: parseMoneyInput(dealForm.value),
         }
 
         const { data, error } = await supabase
@@ -199,7 +283,12 @@ export default function CrmDealsPage() {
 
         if (!error && data) {
             setDeals(prev => [...prev, data])
+            setIsDealDialogOpen(false)
+        } else {
+            console.error(error)
+            setDealError(error?.message || "Não foi possível criar o negócio.")
         }
+        setSavingDeal(false)
     }
 
     const stageColors: Record<string, string> = {
@@ -277,7 +366,8 @@ export default function CrmDealsPage() {
                         </div>
 
                         <Button
-                            onClick={() => handleQuickAdd(stages[0]?.id)}
+                            onClick={() => openDealDialog(stages[0]?.id)}
+                            disabled={!pipeline || stages.length === 0}
                             className="bg-violet-600 hover:bg-violet-700 text-white text-sm"
                         >
                             <Plus className="mr-2 h-4 w-4" /> Novo Negócio
@@ -303,6 +393,123 @@ export default function CrmDealsPage() {
                     })}
                 </div>
             </div>
+
+            <Dialog open={isDealDialogOpen} onOpenChange={setIsDealDialogOpen}>
+                <DialogContent className="sm:max-w-[520px] bg-white dark:bg-[#12142a] border-slate-200 dark:border-white/10">
+                    <DialogHeader>
+                        <DialogTitle>Novo Negócio</DialogTitle>
+                        <DialogDescription>
+                            Cadastre uma oportunidade no pipeline e vincule a um lead quando existir.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateDeal} className="space-y-4">
+                        {dealError && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+                                {dealError}
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="deal-title">Nome do negócio</Label>
+                            <Input
+                                id="deal-title"
+                                value={dealForm.title}
+                                onChange={(event) => setDealForm({ ...dealForm, title: event.target.value })}
+                                placeholder="Ex: Landing page para cliente X"
+                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="deal-value">Valor estimado</Label>
+                                <Input
+                                    id="deal-value"
+                                    value={dealForm.value}
+                                    onChange={(event) => setDealForm({ ...dealForm, value: event.target.value })}
+                                    placeholder="0,00"
+                                    inputMode="decimal"
+                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Estágio</Label>
+                                <Select
+                                    value={dealForm.stageId}
+                                    onValueChange={(value) => setDealForm({ ...dealForm, stageId: value })}
+                                >
+                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10">
+                                        <SelectValue placeholder="Selecione" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {stages.map((stage) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Contato vinculado</Label>
+                                <Select
+                                    value={dealForm.contactId}
+                                    onValueChange={(value) => setDealForm({ ...dealForm, contactId: value })}
+                                >
+                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10">
+                                        <SelectValue placeholder="Sem contato" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={NO_CONTACT_VALUE}>Sem contato</SelectItem>
+                                        {contacts.map((contact) => (
+                                            <SelectItem key={contact.id} value={contact.id}>
+                                                {contact.company ? `${contact.name} · ${contact.company}` : contact.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Origem</Label>
+                                <Select
+                                    value={dealForm.source}
+                                    onValueChange={(value) => setDealForm({ ...dealForm, source: value as DealFormState["source"] })}
+                                >
+                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10">
+                                        <SelectValue placeholder="Sem origem" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={NO_SOURCE_VALUE}>Sem origem</SelectItem>
+                                        {dealSourceOptions.map((source) => (
+                                            <SelectItem key={source.value} value={source.value}>
+                                                {source.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsDealDialogOpen(false)}>
+                                Cancelar
+                            </Button>
+                            <Button type="submit" disabled={savingDeal} className="bg-violet-600 hover:bg-violet-700 text-white">
+                                {savingDeal ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+                                ) : (
+                                    <><Plus className="mr-2 h-4 w-4" /> Criar Negócio</>
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             {/* Kanban View */}
             {viewMode === 'kanban' && (
@@ -385,7 +592,7 @@ export default function CrmDealsPage() {
                                     {/* Quick Add */}
                                     <div className="p-3 pt-1 shrink-0">
                                         <button
-                                            onClick={() => handleQuickAdd(stage.id)}
+                                            onClick={() => openDealDialog(stage.id)}
                                             className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-400 dark:text-gray-600 hover:text-slate-700 dark:text-gray-300 hover:bg-white/5 text-xs font-medium transition-colors"
                                         >
                                             <Plus className="h-3 w-3" /> Adicionar

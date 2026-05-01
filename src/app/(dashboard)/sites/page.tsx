@@ -271,7 +271,7 @@ export default function SitesPage() {
                                                 {site.is_published ? (
                                                     <Badge className="bg-violet-500/80 text-white text-[10px]">Publicado</Badge>
                                                 ) : (
-                                                    <Badge className="bg-gray-600/80 text-slate-700 dark:text-gray-300 text-[10px]">Rascunho</Badge>
+                                                    <Badge className="bg-slate-100 text-slate-700 border border-slate-200 shadow-sm dark:bg-slate-800/90 dark:text-slate-200 dark:border-slate-700 text-[10px]">Rascunho</Badge>
                                                 )}
                                             </div>
                                         </div>

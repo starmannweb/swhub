@@ -1,22 +1,22 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Site, SitePage } from "@/types/sites"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ArrowLeft, Edit, ExternalLink, FileText, Plus, Trash2, Home, Loader2, AlertCircle } from "lucide-react"
+import { ArrowLeft, Edit, FileText, Plus, Trash2, Home, Loader2, AlertCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 export default function SiteDashboardPage() {
     const params = useParams()
     const router = useRouter()
     const siteId = params.id as string
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     const [site, setSite] = useState<Site | null>(null)
     const [pages, setPages] = useState<SitePage[]>([])
@@ -71,7 +71,7 @@ export default function SiteDashboardPage() {
                     .replace(/(^-|-$)+/g, '')
             )
         }
-    }, [newPageName])
+    }, [newPageName, newPageSlug])
 
     const handleCreatePage = async () => {
         setErrorMsg("")
@@ -83,7 +83,7 @@ export default function SiteDashboardPage() {
         try {
             const isFirst = pages.length === 0
 
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from("site_pages")
                 .insert([{
                     site_id: siteId,
@@ -158,7 +158,7 @@ export default function SiteDashboardPage() {
                         {site.is_published ? (
                             <Badge className="bg-green-500">Online</Badge>
                         ) : (
-                            <Badge variant="secondary">Rascunho</Badge>
+                            <Badge className="bg-slate-100 text-slate-700 border border-slate-200 shadow-sm dark:bg-slate-800/90 dark:text-slate-200 dark:border-slate-700">Rascunho</Badge>
                         )}
                     </p>
                 </div>
@@ -207,7 +207,7 @@ export default function SiteDashboardPage() {
                                             onChange={(e) => setNewPageSlug(e.target.value)}
                                         />
                                     </div>
-                                    <p className="text-xs text-muted-foreground">Mantenha limpo, sem espaços, use "-" para espaços.</p>
+                                    <p className="text-xs text-muted-foreground">Mantenha limpo, sem espaços, use hífen para espaços.</p>
                                 </div>
                             </div>
                             <DialogFooter>

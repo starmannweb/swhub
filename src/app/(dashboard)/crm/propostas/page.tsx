@@ -1,14 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-    Plus, Search, Filter,
-    MoreHorizontal, Calendar, FileText, Send, CheckCircle2, Clock, XCircle, Link2, MoreVertical
+    Plus, Search,
+    FileText, Send, CheckCircle2, Clock, XCircle, Link2, MoreVertical, Loader2
 } from "lucide-react"
 import {
     DropdownMenu,
@@ -17,20 +20,82 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+type ContactOption = {
+    id: string
+    name: string
+    company: string | null
+}
+
+type DealOption = {
+    id: string
+    title: string
+    value: number | null
+    contact_id: string | null
+}
+
+type ProposalFormState = {
+    title: string
+    contactId: string
+    dealId: string
+    totalValue: string
+    validUntil: string
+    description: string
+}
+
+type ProposalRow = {
+    id: string
+    title: string
+    status: string
+    total_value: number
+    valid_until: string | null
+    crm_contacts?: {
+        name: string | null
+        company: string | null
+    } | null
+    crm_deals?: {
+        title: string
+        value: number | null
+    } | null
+}
+
+const NO_DEAL_VALUE = "none"
+
+function getDefaultValidUntil() {
+    return new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+}
+
+function parseMoneyInput(value: string) {
+    const normalized = value.replace(/\./g, "").replace(",", ".")
+    const parsed = Number.parseFloat(normalized)
+    return Number.isFinite(parsed) ? parsed : 0
+}
+
 export default function CrmPropostasPage() {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const [search, setSearch] = useState("")
-    const [propostas, setPropostas] = useState<any[]>([])
+    const [propostas, setPropostas] = useState<ProposalRow[]>([])
     const [loading, setLoading] = useState(true)
+    const [contatos, setContatos] = useState<ContactOption[]>([])
+    const [deals, setDeals] = useState<DealOption[]>([])
+    const [isProposalDialogOpen, setIsProposalDialogOpen] = useState(false)
+    const [savingProposal, setSavingProposal] = useState(false)
+    const [proposalError, setProposalError] = useState("")
+    const [proposalForm, setProposalForm] = useState<ProposalFormState>({
+        title: "",
+        contactId: "",
+        dealId: NO_DEAL_VALUE,
+        totalValue: "",
+        validUntil: getDefaultValidUntil(),
+        description: "",
+    })
 
-    useEffect(() => {
-        fetchPropostas()
-    }, [])
-
-    async function fetchPropostas() {
+    const fetchPropostas = useCallback(async () => {
         setLoading(true)
         const { data: userAuth } = await supabase.auth.getUser()
-        if (!userAuth.user) return
+        if (!userAuth.user) {
+            setLoading(false)
+            return
+        }
 
         const { data, error } = await supabase
             .from('crm_proposals')
@@ -46,58 +111,115 @@ export default function CrmPropostasPage() {
             setPropostas(data)
         }
         setLoading(false)
-    }
+    }, [supabase])
 
-    async function handleAddProposta() {
+    const fetchFormOptions = useCallback(async () => {
         const { data: userAuth } = await supabase.auth.getUser()
         if (!userAuth.user) return
 
-        const { data: contatos } = await supabase.from('crm_contacts').select('id, name').eq('user_id', userAuth.user.id).limit(20)
+        const [{ data: contactData }, { data: dealData }] = await Promise.all([
+            supabase
+                .from('crm_contacts')
+                .select('id, name, company')
+                .eq('user_id', userAuth.user.id)
+                .order('created_at', { ascending: false })
+                .limit(100),
+            supabase
+                .from('crm_deals')
+                .select('id, title, value, contact_id')
+                .eq('user_id', userAuth.user.id)
+                .neq('status', 'lost')
+                .order('created_at', { ascending: false })
+                .limit(100),
+        ])
 
-        if (!contatos || contatos.length === 0) {
-            alert("Crie um Contato/Lead no CRM antes de criar propostas.")
+        setContatos(contactData || [])
+        setDeals(dealData || [])
+    }, [supabase])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void fetchPropostas()
+            void fetchFormOptions()
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [fetchFormOptions, fetchPropostas])
+
+    function openProposalDialog() {
+        setProposalForm({
+            title: "",
+            contactId: contatos[0]?.id || "",
+            dealId: NO_DEAL_VALUE,
+            totalValue: "",
+            validUntil: getDefaultValidUntil(),
+            description: "",
+        })
+        setProposalError("")
+        setIsProposalDialogOpen(true)
+    }
+
+    function handleProposalDealChange(value: string) {
+        const selectedDeal = deals.find((deal) => deal.id === value)
+        setProposalForm((current) => ({
+            ...current,
+            dealId: value,
+            contactId: selectedDeal?.contact_id || current.contactId,
+            totalValue: selectedDeal?.value ? String(selectedDeal.value).replace(".", ",") : current.totalValue,
+            title: current.title || (selectedDeal ? `Proposta - ${selectedDeal.title}` : current.title),
+        }))
+    }
+
+    async function handleCreateProposta(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        setProposalError("")
+
+        if (contatos.length === 0) {
+            setProposalError("Crie um contato ou lead antes de cadastrar uma proposta.")
             return
         }
 
-        const { data: deals } = await supabase.from('crm_deals').select('id, title').eq('user_id', userAuth.user.id).limit(20)
+        const title = proposalForm.title.trim()
+        if (!title) {
+            setProposalError("Informe o título da proposta.")
+            return
+        }
 
-        const title = prompt("Título da Proposta:")
-        if (!title) return
+        if (!proposalForm.contactId) {
+            setProposalError("Selecione o cliente ou lead da proposta.")
+            return
+        }
 
-        const amountStr = prompt("Valor Total (R$):")
-        if (!amountStr) return
-
-        let dealId = null
-        if (deals && deals.length > 0) {
-            const dealNames = deals.map((d, i) => `${i + 1}. ${d.title}`).join("\n")
-            const dealChoice = prompt(`Vincular a um negócio? (número)\n${dealNames}\n\nDeixe em branco para não vincular:`)
-            if (dealChoice) {
-                const idx = parseInt(dealChoice) - 1
-                if (deals[idx]) dealId = deals[idx].id
-            }
+        setSavingProposal(true)
+        const { data: userAuth } = await supabase.auth.getUser()
+        if (!userAuth.user) {
+            setSavingProposal(false)
+            return
         }
 
         const { data, error } = await supabase
             .from('crm_proposals')
             .insert({
                 user_id: userAuth.user.id,
-                contact_id: contatos[0].id,
-                deal_id: dealId,
-                title: title,
-                description: '',
+                contact_id: proposalForm.contactId,
+                deal_id: proposalForm.dealId === NO_DEAL_VALUE ? null : proposalForm.dealId,
+                title,
+                description: proposalForm.description,
                 status: 'draft',
-                total_value: parseFloat(amountStr),
-                valid_until: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+                total_value: parseMoneyInput(proposalForm.totalValue),
+                valid_until: proposalForm.validUntil || null
             })
             .select(`*, crm_contacts:contact_id(name, company), crm_deals:deal_id(title, value)`)
             .single()
 
         if (!error && data) {
-            setPropostas([data, ...propostas])
+            setPropostas((current) => [data, ...current])
+            setIsProposalDialogOpen(false)
         } else {
             console.error(error)
-            alert("Erro ao criar proposta.")
+            setProposalError(error?.message || "Erro ao criar proposta.")
         }
+        setSavingProposal(false)
     }
 
     const formatCurrency = (val: number) => {
@@ -150,13 +272,130 @@ export default function CrmPropostasPage() {
                         />
                     </div>
                     <Button
-                        onClick={handleAddProposta}
+                        onClick={openProposalDialog}
                         className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Nova Proposta
                     </Button>
                 </div>
             </div>
+
+            <Dialog open={isProposalDialogOpen} onOpenChange={setIsProposalDialogOpen}>
+                <DialogContent className="sm:max-w-[620px] bg-white dark:bg-[#12142a] border-slate-200 dark:border-white/10">
+                    <DialogHeader>
+                        <DialogTitle>Nova Proposta</DialogTitle>
+                        <DialogDescription>
+                            Crie uma proposta vinculada a um contato e, se quiser, a um negócio do CRM.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateProposta} className="space-y-4">
+                        {proposalError && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
+                                {proposalError}
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="proposal-title">Título</Label>
+                            <Input
+                                id="proposal-title"
+                                value={proposalForm.title}
+                                onChange={(event) => setProposalForm({ ...proposalForm, title: event.target.value })}
+                                placeholder="Ex: Proposta de site institucional"
+                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Cliente / lead</Label>
+                                <Select
+                                    value={proposalForm.contactId}
+                                    onValueChange={(value) => setProposalForm({ ...proposalForm, contactId: value })}
+                                    disabled={contatos.length === 0}
+                                >
+                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10">
+                                        <SelectValue placeholder={contatos.length === 0 ? "Nenhum contato cadastrado" : "Selecione"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {contatos.map((contato) => (
+                                            <SelectItem key={contato.id} value={contato.id}>
+                                                {contato.company ? `${contato.name} · ${contato.company}` : contato.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Negócio</Label>
+                                <Select value={proposalForm.dealId} onValueChange={handleProposalDealChange}>
+                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10">
+                                        <SelectValue placeholder="Não vincular" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={NO_DEAL_VALUE}>Não vincular</SelectItem>
+                                        {deals.map((deal) => (
+                                            <SelectItem key={deal.id} value={deal.id}>
+                                                {deal.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="proposal-value">Valor total</Label>
+                                <Input
+                                    id="proposal-value"
+                                    value={proposalForm.totalValue}
+                                    onChange={(event) => setProposalForm({ ...proposalForm, totalValue: event.target.value })}
+                                    placeholder="0,00"
+                                    inputMode="decimal"
+                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="proposal-valid-until">Validade</Label>
+                                <Input
+                                    id="proposal-valid-until"
+                                    type="date"
+                                    value={proposalForm.validUntil}
+                                    onChange={(event) => setProposalForm({ ...proposalForm, validUntil: event.target.value })}
+                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="proposal-description">Descrição</Label>
+                            <Textarea
+                                id="proposal-description"
+                                value={proposalForm.description}
+                                onChange={(event) => setProposalForm({ ...proposalForm, description: event.target.value })}
+                                placeholder="Resumo do escopo, itens inclusos ou observações."
+                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/10"
+                            />
+                        </div>
+
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsProposalDialogOpen(false)}>
+                                Cancelar
+                            </Button>
+                            <Button type="submit" disabled={savingProposal || contatos.length === 0} className="bg-violet-600 hover:bg-violet-700 text-white">
+                                {savingProposal ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+                                ) : (
+                                    <><Plus className="mr-2 h-4 w-4" /> Criar Proposta</>
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             {loading ? (
                 <div className="flex justify-center py-16">
@@ -167,13 +406,13 @@ export default function CrmPropostasPage() {
                     <FileText className="h-10 w-10 text-slate-300 dark:text-gray-600 mx-auto mb-3" />
                     <h3 className="text-sm font-semibold text-slate-700 dark:text-gray-300 mb-1">Nenhuma proposta encontrada</h3>
                     <p className="text-xs text-slate-500 dark:text-gray-600">Crie sua primeira proposta e vincule a um negócio do pipeline.</p>
-                    <Button onClick={handleAddProposta} variant="outline" className="mt-4 border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5">
+                    <Button onClick={openProposalDialog} variant="outline" className="mt-4 border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5">
                         Criar Proposta
                     </Button>
                 </div>
             ) : (
                 <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden shadow-sm">
-                    <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#161616] hidden md:grid">
+                    <div className="grid grid-cols-12 gap-4 p-4 text-[11px] font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider border-b border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a] hidden md:grid">
                         <div className="col-span-4">Cliente & Título</div>
                         <div className="col-span-2 text-center">Negócio</div>
                         <div className="col-span-2 text-center">Valor</div>
@@ -185,7 +424,9 @@ export default function CrmPropostasPage() {
                     <div className="divide-y divide-slate-100 dark:divide-white/5">
                         {filteredPropostas.map(proposta => {
                             const status = getStatusInfo(proposta.status)
-                            const isExpired = new Date(proposta.valid_until) < new Date() && proposta.status !== 'accepted' && proposta.status !== 'rejected'
+                            const isExpired = proposta.valid_until
+                                ? new Date(proposta.valid_until) < new Date() && proposta.status !== 'accepted' && proposta.status !== 'rejected'
+                                : false
 
                             return (
                                 <div key={proposta.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">

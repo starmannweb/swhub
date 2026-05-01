@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
-    Settings, Plus, Trash2, GripVertical, Loader2, Save, KanbanSquare, Palette, ShieldCheck, LayoutTemplate, Download, ArrowRight, User, Bot, Share2
+    Settings, Plus, Trash2, Loader2, Save, KanbanSquare, ShieldCheck, LayoutTemplate, Download, ArrowRight, Bot, Share2, CreditCard, CheckCircle2, Clock, PlugZap
 } from "lucide-react"
 import Link from "next/link"
 
@@ -29,36 +29,28 @@ const STAGE_COLORS = [
 ]
 
 export default function ConfiguracoesPage() {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [pipelineId, setPipelineId] = useState<string | null>(null)
     const [pipelineName, setPipelineName] = useState("")
     const [stages, setStages] = useState<PipelineStage[]>([])
-    const [tab, setTab] = useState<"conta" | "pipeline" | "geral" | "admin">("conta")
+    const [tab, setTab] = useState<"geral" | "pipeline" | "integracoes" | "financeiro" | "admin">("geral")
     const [isAdmin, setIsAdmin] = useState(false)
-    const [profile, setProfile] = useState({ full_name: "", email: "", phone: "" })
-    const [savingProfile, setSavingProfile] = useState(false)
 
-    useEffect(() => {
-        fetchPipeline()
-    }, [])
-
-    async function fetchPipeline() {
+    const fetchPipeline = useCallback(async () => {
         setLoading(true)
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
+        if (!user) {
+            setLoading(false)
+            return
+        }
 
         // Check if admin
-        const { data: profileData } = await supabase.from('profiles').select('is_admin, role, full_name, phone').eq('id', user.id).single()
+        const { data: profileData } = await supabase.from('profiles').select('is_admin, role').eq('id', user.id).single()
         if (profileData?.is_admin || profileData?.role === 'admin') {
             setIsAdmin(true)
         }
-        setProfile({
-            full_name: profileData?.full_name || user.user_metadata?.full_name || "",
-            email: user.email || "",
-            phone: profileData?.phone || ""
-        })
 
         const { data: pipeline } = await supabase
             .from("crm_pipelines")
@@ -80,7 +72,15 @@ export default function ConfiguracoesPage() {
             setStages(stagesData || [])
         }
         setLoading(false)
-    }
+    }, [supabase])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void fetchPipeline()
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [fetchPipeline])
 
     function handleAddStage() {
         if (!pipelineId) return
@@ -176,15 +176,7 @@ export default function ConfiguracoesPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#12142a] p-0.5 w-fit">
-                <button
-                    onClick={() => setTab("conta")}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
-                        tab === "conta" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
-                    }`}
-                >
-                    <User className="h-3.5 w-3.5" /> Meus Dados
-                </button>
+            <div className="flex items-center flex-wrap gap-2 md:gap-0 md:flex-nowrap rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#12142a] p-0.5 w-fit">
                 <button
                     onClick={() => setTab("geral")}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
@@ -207,7 +199,15 @@ export default function ConfiguracoesPage() {
                         tab === "integracoes" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
                     }`}
                 >
-                    <Share2 className="h-3.5 w-3.5" /> Integrações (IA / Meta)
+                    <Share2 className="h-3.5 w-3.5" /> Marketplace & Integrações
+                </button>
+                <button
+                    onClick={() => setTab("financeiro")}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                        tab === "financeiro" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
+                    }`}
+                >
+                    <CreditCard className="h-3.5 w-3.5" /> Situação Financeira
                 </button>
                 {isAdmin && (
                     <button
@@ -221,62 +221,51 @@ export default function ConfiguracoesPage() {
                 )}
             </div>
 
-            {/* Meus Dados Tab */}
-            {tab === "conta" && (
-                <div className="space-y-6 w-full">
-                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
-                        <h2 className="text-sm font-bold text-slate-900 dark:text-white">Informações Pessoais</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Nome Completo</label>
-                                <Input
-                                    value={profile.full_name}
-                                    onChange={(e) => setProfile({...profile, full_name: e.target.value})}
-                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white h-11"
-                                />
+            {/* Situação Financeira Tab */}
+            {tab === "financeiro" && (
+                <div className="space-y-5 w-full">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 shadow-sm">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                    <CheckCircle2 className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">Plataforma ativa</p>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">Sua conta está apta para usar CRM, sites, propostas e automações.</p>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">E-mail</label>
-                                <Input
-                                    value={profile.email}
-                                    disabled
-                                    className="bg-slate-100 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-gray-400 h-11 cursor-not-allowed"
-                                />
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Telefone / WhatsApp</label>
-                                <Input
-                                    value={profile.phone}
-                                    onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                                    placeholder="(11) 99999-9999"
-                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white h-11"
-                                />
+                            <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                <CheckCircle2 className="h-3.5 w-3.5" /> Em dia
                             </div>
                         </div>
-                        <div className="flex justify-end pt-2">
-                            <Button
-                                onClick={async () => {
-                                    setSavingProfile(true)
-                                    const { data: { user } } = await supabase.auth.getUser()
-                                    if (user) {
-                                        await supabase.from('profiles').update({
-                                            full_name: profile.full_name,
-                                            phone: profile.phone
-                                        }).eq('id', user.id)
-                                        await supabase.auth.updateUser({ data: { full_name: profile.full_name } })
-                                    }
-                                    setSavingProfile(false)
-                                    alert("Perfil atualizado!")
-                                }}
-                                disabled={savingProfile}
-                                className="bg-violet-600 hover:bg-violet-700 text-white px-6"
-                            >
-                                {savingProfile ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
-                                ) : (
-                                    <><Save className="mr-2 h-4 w-4" /> Salvar Alterações</>
-                                )}
-                            </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 shadow-sm">
+                            <p className="text-xs font-semibold text-slate-500 dark:text-gray-400">Plano atual</p>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white mt-2">SWHub Pro</p>
+                            <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Recursos principais liberados</p>
+                        </div>
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 shadow-sm">
+                            <p className="text-xs font-semibold text-slate-500 dark:text-gray-400">Próxima cobrança</p>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white mt-2">A definir</p>
+                            <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Conecte o gateway para automatizar</p>
+                        </div>
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 shadow-sm">
+                            <p className="text-xs font-semibold text-slate-500 dark:text-gray-400">Faturas da plataforma</p>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white mt-2">0 pendentes</p>
+                            <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Histórico financeiro em preparação</p>
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-5 shadow-sm">
+                        <div className="flex items-start gap-3">
+                            <Clock className="h-5 w-5 text-amber-500 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">Gestão financeira da plataforma</p>
+                                <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">Este espaço fica reservado para assinatura, faturas, pagamentos e gateway da própria plataforma.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -285,6 +274,42 @@ export default function ConfiguracoesPage() {
             {/* Integrações Tab */}
             {tab === "integracoes" && (
                 <div className="space-y-6 w-full">
+                    <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 shadow-sm">
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="h-10 w-10 rounded-lg bg-violet-500/10 text-violet-500 flex items-center justify-center">
+                                <PlugZap className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Marketplace de Integrações</h2>
+                                <p className="text-xs text-slate-500 dark:text-gray-400">Conectores essenciais para captar leads, automatizar e medir resultados.</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {[
+                                { name: "OpenAI", desc: "Geração de sites e automações com IA", status: "Configurar" },
+                                { name: "Meta Ads", desc: "Leads, pixel e API de conversões", status: "Configurar" },
+                                { name: "WhatsApp", desc: "Disparos e atendimento conectado", status: "Em breve" },
+                            ].map((item) => (
+                                <div key={item.name} className="rounded-lg border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a] p-4">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.name}</p>
+                                            <p className="text-xs text-slate-500 dark:text-gray-500 mt-1 leading-relaxed">{item.desc}</p>
+                                        </div>
+                                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                            item.status === "Em breve"
+                                                ? "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                                                : "bg-violet-100 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300"
+                                        }`}>
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* IA Integration */}
                         <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
@@ -473,7 +498,7 @@ export default function ConfiguracoesPage() {
                 <div className="space-y-6 w-full rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-8 text-center shadow-sm">
                     <Settings className="h-8 w-8 text-slate-300 dark:text-gray-700 mx-auto mb-3" />
                     <p className="text-sm text-slate-500 dark:text-gray-400 font-semibold">Configurações gerais em breve</p>
-                    <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Perfil, notificações, integrações e preferências do sistema.</p>
+                    <p className="text-xs text-slate-400 dark:text-gray-600 mt-1">Preferências do sistema, notificações e comportamento global.</p>
                 </div>
             )}
 
