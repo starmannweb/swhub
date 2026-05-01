@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
-    Settings, Plus, Trash2, GripVertical, Loader2, Save, KanbanSquare, Palette, ShieldCheck, LayoutTemplate, Download, ArrowRight, User
+    Settings, Plus, Trash2, GripVertical, Loader2, Save, KanbanSquare, Palette, ShieldCheck, LayoutTemplate, Download, ArrowRight, User, Bot, Share2
 } from "lucide-react"
 import Link from "next/link"
 
@@ -201,6 +201,14 @@ export default function ConfiguracoesPage() {
                 >
                     <KanbanSquare className="h-3.5 w-3.5" /> Pipeline CRM
                 </button>
+                <button
+                    onClick={() => setTab("integracoes")}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                        tab === "integracoes" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
+                    }`}
+                >
+                    <Share2 className="h-3.5 w-3.5" /> Integrações (IA / Meta)
+                </button>
                 {isAdmin && (
                     <button
                         onClick={() => setTab("admin")}
@@ -269,6 +277,72 @@ export default function ConfiguracoesPage() {
                                     <><Save className="mr-2 h-4 w-4" /> Salvar Alterações</>
                                 )}
                             </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Integrações Tab */}
+            {tab === "integracoes" && (
+                <div className="space-y-6 max-w-4xl">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* IA Integration */}
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-lg bg-violet-500/10">
+                                    <Bot className="h-6 w-6 text-violet-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">Integração com IA</h2>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400">Configure seu assistente e geração de sites.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">API Key OpenAI</label>
+                                    <Input
+                                        type="password"
+                                        placeholder="sk-..."
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+                                    Salvar Configuração de IA
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Meta Integration */}
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-lg bg-blue-500/10">
+                                    <Share2 className="h-6 w-6 text-blue-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">Meta (Facebook/Instagram)</h2>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400">Integre campanhas, leads e conversões.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Pixel ID Principal</label>
+                                    <Input
+                                        placeholder="1234567890"
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Token da API de Conversões (CAPI)</label>
+                                    <Input
+                                        type="password"
+                                        placeholder="EAA..."
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                                    Salvar Integração Meta
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

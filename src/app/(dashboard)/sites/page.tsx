@@ -98,7 +98,7 @@ export default function SitesPage() {
         <div className="space-y-8">
             {/* ── Create New Site ── */}
             <div>
-                <h1 className="text-2xl font-bold text-white mb-1">Criar Novo Site</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Criar Novo Site</h1>
                 <p className="text-sm text-slate-500 dark:text-gray-500 mb-6">Escolha como deseja começar seu novo projeto</p>
 
                 <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-6">
@@ -109,7 +109,7 @@ export default function SitesPage() {
                             placeholder="Minha Landing Page"
                             value={siteName}
                             onChange={(e) => setSiteName(e.target.value)}
-                            className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white placeholder:text-slate-400 dark:text-gray-600 max-w-md h-12 text-base"
+                            className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 max-w-md h-12 text-base"
                         />
                     </div>
 
@@ -146,7 +146,7 @@ export default function SitesPage() {
                                     <div className={`mb-3 ${isActive ? "text-violet-400" : "text-slate-500 dark:text-gray-500"}`}>
                                         {mode.icon}
                                     </div>
-                                    <p className="font-semibold text-sm text-white mb-1">{mode.title}</p>
+                                    <p className="font-semibold text-sm text-slate-900 dark:text-white mb-1">{mode.title}</p>
                                     <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{mode.desc}</p>
                                 </button>
                             )
@@ -269,13 +269,13 @@ export default function SitesPage() {
                                             </div>
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="text-sm font-semibold text-white truncate">{site.name}</h3>
+                                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white truncate">{site.name}</h3>
                                             <p className="text-[11px] text-slate-400 dark:text-gray-600 truncate mt-0.5">/{site.slug}</p>
                                             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="text-gray-400 hover:text-white hover:bg-white/5 text-xs h-8 px-3"
+                                                    className="text-gray-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 text-xs h-8 px-3"
                                                     onClick={() => router.push(`/sites/${site.id}`)}
                                                 >
                                                     <Edit className="mr-1.5 h-3 w-3" /> Editar
@@ -322,12 +322,12 @@ export default function SitesPage() {
                                     placeholder="meusite.com.br"
                                     value={newDomain}
                                     onChange={(e) => setNewDomain(e.target.value)}
-                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white placeholder:text-slate-400 dark:text-gray-600 h-10 flex-1"
+                                    className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-gray-600 h-10 flex-1"
                                 />
                                 <select
                                     value={selectedSiteForDomain}
                                     onChange={(e) => setSelectedSiteForDomain(e.target.value)}
-                                    className="h-10 rounded-md bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] text-white text-sm px-3 min-w-[200px]"
+                                    className="h-10 rounded-md bg-slate-50 dark:bg-[#0d0f1a] border border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white text-sm px-3 min-w-[200px]"
                                 >
                                     <option value="">Selecionar site...</option>
                                     {publishedSites.map(s => (
@@ -373,7 +373,7 @@ export default function SitesPage() {
                                 </div>
                                 <button
                                     onClick={() => navigator.clipboard.writeText("proxy.swhub.com.br")}
-                                    className="text-xs text-slate-500 dark:text-gray-500 hover:text-white transition-colors"
+                                    className="text-xs text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors"
                                 >
                                     <Copy className="h-4 w-4" />
                                 </button>

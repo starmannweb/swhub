@@ -248,7 +248,7 @@ export default function CrmDealsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                         {/* View Toggle */}
-                        <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-[#1e1e1e] p-0.5">
+                        <div className="flex items-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1e1e1e] p-0.5">
                             <button
                                 onClick={() => setViewMode('kanban')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -343,11 +343,11 @@ export default function CrmDealsPage() {
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, deal.id)}
                                                 onDragEnd={handleDragEnd}
-                                                className="group cursor-grab active:cursor-grabbing rounded-lg bg-[#1a1f3a] border border-slate-200 dark:border-white/[0.06] p-3 hover:border-violet-500/30 transition-all duration-200"
+                                                className="group cursor-grab active:cursor-grabbing rounded-lg bg-slate-50 dark:bg-[#1a1f3a] border border-slate-200 dark:border-white/[0.06] p-3 hover:border-violet-500/30 transition-all duration-200"
                                             >
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="space-y-1 pr-2 min-w-0">
-                                                        <p className="text-sm font-semibold text-white leading-tight truncate">{deal.title}</p>
+                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight truncate">{deal.title}</p>
                                                         <p className="text-[11px] text-slate-500 dark:text-gray-500">
                                                             {deal.contact_id ? 'Contato vinculado' : 'Sem contato'}
                                                         </p>
@@ -418,7 +418,7 @@ export default function CrmDealsPage() {
                                 Nenhum negócio ativo. Crie o primeiro acima.
                             </div>
                         ) : (
-                            <div className="divide-y divide-white/5">
+                            <div className="divide-y divide-slate-200 dark:divide-white/5">
                                 {deals.map((deal) => {
                                     const stage = getStageForDeal(deal)
                                     const colorClass = stageColorsDot[stage?.color || 'blue'] || 'bg-blue-400'
@@ -426,7 +426,7 @@ export default function CrmDealsPage() {
                                     return (
                                         <div key={deal.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group cursor-pointer">
                                             <div className="col-span-4">
-                                                <p className="text-sm font-semibold text-white truncate">{deal.title}</p>
+                                                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{deal.title}</p>
                                                 <p className="text-[11px] text-slate-400 dark:text-gray-600 mt-0.5">
                                                     {deal.contact_id ? 'Contato vinculado' : 'Sem contato'}
                                                 </p>
