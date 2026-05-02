@@ -1,18 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import {
     Card,
-    CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Plus, Edit2, Trash2, LayoutTemplate } from "lucide-react"
+import { Plus, Edit2, Trash2, LayoutTemplate, Upload } from "lucide-react"
 
 import { TemplateModal } from "./components/template-modal"
 
@@ -20,24 +18,21 @@ type SiteTemplate = {
     id: string
     name: string
     category: string
-    content: any
+    content: Record<string, unknown> | unknown[]
     preview_image: string | null
     is_public: boolean
     created_at: string
 }
 
 export default function AdminModelosPage() {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
+    const jsonInputRef = useRef<HTMLInputElement>(null)
     const [templates, setTemplates] = useState<SiteTemplate[]>([])
     const [loading, setLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingTemplate, setEditingTemplate] = useState<SiteTemplate | undefined>()
 
-    useEffect(() => {
-        fetchTemplates()
-    }, [])
-
-    const fetchTemplates = async () => {
+    const fetchTemplates = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from("site_templates")
@@ -52,7 +47,15 @@ export default function AdminModelosPage() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [supabase])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void fetchTemplates()
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [fetchTemplates])
 
     const handleDelete = async (id: string) => {
         if (!confirm("Tem certeza que deseja excluir este modelo?")) return
@@ -66,7 +69,7 @@ export default function AdminModelosPage() {
             if (error) throw error
 
             alert("Modelo excluído com sucesso")
-            fetchTemplates()
+            void fetchTemplates()
         } catch (error) {
             console.error("Erro ao excluir modelo:", error)
             alert("Erro ao excluir modelo")
@@ -84,8 +87,46 @@ export default function AdminModelosPage() {
     }
 
     const handleSaved = () => {
-        fetchTemplates()
+        void fetchTemplates()
     }
+
+    const handleImportJsonFile = useCallback((file?: File) => {
+        if (!file) return
+
+        const reader = new FileReader()
+        reader.onload = async (event) => {
+            try {
+                const parsed = JSON.parse(String(event.target?.result || "{}"))
+                const { data: { session } } = await supabase.auth.getSession()
+
+                if (!session?.user?.id) {
+                    alert("Voce precisa estar logado para importar modelos.")
+                    return
+                }
+
+                const content = parsed.content || parsed.project || parsed
+                const fallbackName = file.name.replace(/\.json$/i, "").replace(/[-_]+/g, " ")
+                const modelData = {
+                    name: parsed.name || parsed.title || fallbackName,
+                    category: parsed.category || parsed.segment || "Importado",
+                    content,
+                    preview_image: parsed.preview_image || parsed.previewImage || parsed.image_url || null,
+                    is_public: parsed.is_public ?? true,
+                    user_id: session.user.id,
+                }
+
+                const { error } = await supabase.from("site_templates").insert([modelData])
+                if (error) throw error
+
+                alert("Modelo importado com sucesso!")
+                void fetchTemplates()
+            } catch (error) {
+                console.error("Erro ao importar JSON:", error)
+                alert("Nao foi possivel importar esse JSON como modelo.")
+            }
+        }
+        reader.readAsText(file)
+    }, [fetchTemplates, supabase])
 
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
@@ -97,6 +138,19 @@ export default function AdminModelosPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
+                    <Button variant="outline" onClick={() => jsonInputRef.current?.click()}>
+                        <Upload className="mr-2 h-4 w-4" /> Importar JSON
+                    </Button>
+                    <input
+                        ref={jsonInputRef}
+                        type="file"
+                        accept=".json,application/json"
+                        className="hidden"
+                        onChange={(event) => {
+                            handleImportJsonFile(event.target.files?.[0])
+                            event.target.value = ""
+                        }}
+                    />
                     <Button onClick={handleCreate}>
                         <Plus className="mr-2 h-4 w-4" /> Novo Modelo
                     </Button>

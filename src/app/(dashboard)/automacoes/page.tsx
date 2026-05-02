@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Zap, Plus, Save, CircleDot,
-    MessageSquare, Clock, Database, X, Sparkles, Minus, Maximize,
-    Target, Tags, UserPlus, FileEdit, Archive, ChevronLeft, GitBranch, LayoutGrid, Mail,
+    MessageSquare, Clock, X, Sparkles, Minus, Maximize,
+    Tags, UserPlus, FileEdit, ChevronLeft, GitBranch, LayoutGrid, Mail,
     Trash2
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -110,7 +109,7 @@ function SortableActionItem({
 }
 
 export default function AutomacoesPage() {
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
     const [workflowId, setWorkflowId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -124,17 +123,16 @@ export default function AutomacoesPage() {
     const [triggers, setTriggers] = useState<WorkflowStep[]>([]);
     const [actions, setActions] = useState<WorkflowStep[]>([]);
 
-    useEffect(() => {
-        loadWorkflow();
-    }, []);
-
-    const loadWorkflow = async () => {
+    const loadWorkflow = useCallback(async () => {
         setIsLoading(true);
         // Load the most recent workflow or create one
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+            setIsLoading(false);
+            return;
+        }
 
-        const { data: existing, error } = await supabase
+        const { data: existing } = await supabase
             .from('automation_workflows')
             .select('*')
             .eq('user_id', user.id)
@@ -150,7 +148,15 @@ export default function AutomacoesPage() {
             setActions(existing.actions || []);
         }
         setIsLoading(false);
-    };
+    }, [supabase]);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void loadWorkflow();
+        }, 0);
+
+        return () => window.clearTimeout(timer);
+    }, [loadWorkflow]);
 
     const handleSave = async () => {
         if (!workflowName.trim()) return;
@@ -170,7 +176,7 @@ export default function AutomacoesPage() {
         if (workflowId) {
             await supabase.from('automation_workflows').update(payload).eq('id', workflowId);
         } else {
-            const { data, error } = await supabase.from('automation_workflows').insert(payload).select().single();
+            const { data } = await supabase.from('automation_workflows').insert(payload).select().single();
             if (data) setWorkflowId(data.id);
         }
 
@@ -225,7 +231,7 @@ export default function AutomacoesPage() {
     const removeAction = (id: string) => setActions(actions.filter(a => a.id !== id));
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#f8fafc] dark:bg-slate-950 overflow-hidden relative font-sans text-slate-800 dark:text-slate-200">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#f8fafc] dark:bg-slate-950 overflow-hidden relative font-sans text-slate-800 dark:text-slate-200" aria-busy={isLoading}>
 
             {/* 1. TOP BAR (Responsive & Fixed Layout) */}
             <div className="min-h-16 px-4 md:px-6 bg-white dark:bg-slate-900 border-b flex flex-col md:flex-row items-center justify-between shrink-0 z-30 shadow-sm gap-4 py-2 md:py-0 w-full">
@@ -275,9 +281,10 @@ export default function AutomacoesPage() {
             </div>
 
             {/* MAIN CANVAS AREA */}
-            <div className="flex-1 flex relative overflow-hidden bg-[#f8fafc] dark:bg-slate-950">
+            <div className="flex-1 flex relative overflow-hidden bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.08),transparent_34%),linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.16),transparent_34%),linear-gradient(180deg,#070914_0%,#050711_100%)]">
 
                 {/* INFINITE GRID BACKGROUND */}
+                <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-violet-500/[0.04] via-transparent to-blue-500/[0.035] dark:from-violet-400/[0.08] dark:to-blue-400/[0.04]"></div>
                 <div
                     className="absolute inset-0 z-0 pointer-events-none opacity-[0.04] dark:opacity-[0.02]"
                     style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '30px 30px', color: '#94a3b8' }}

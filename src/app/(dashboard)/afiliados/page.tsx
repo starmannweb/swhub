@@ -1,14 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import {
     Users, Copy, CheckCircle2, DollarSign, MousePointerClick, TrendingUp,
-    Award, Share2, Mail, ArrowRight, Percent, Crown, Trophy, Star,
-    ExternalLink, Loader2, Send, Gift, BarChart3, Wallet, Eye, Megaphone,
+    Award, Share2, Mail, ArrowRight, Percent, Crown, Trophy,
+    Send, Gift, BarChart3, Wallet, Eye, Megaphone,
 } from "lucide-react"
 
 type AffiliateTab = "dashboard" | "afiliados" | "materiais" | "formulario"
@@ -81,7 +80,6 @@ const SHARE_MATERIALS = [
 ]
 
 export default function AfiliadosPage() {
-    const supabase = createClient()
     const [tab, setTab] = useState<AffiliateTab>("dashboard")
     const [copied, setCopied] = useState(false)
     const [copiedForm, setCopiedForm] = useState(false)
@@ -189,11 +187,11 @@ export default function AfiliadosPage() {
                             <Input
                                 readOnly
                                 value={affiliateLink}
-                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white font-mono text-sm h-11"
+                                className="bg-white dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white font-mono text-sm h-11 shadow-sm"
                             />
                             <Button
                                 onClick={() => handleCopy(affiliateLink, setCopied)}
-                                className={`shrink-0 h-11 px-5 ${copied ? "bg-violet-600 text-white" : "bg-white/[0.06] text-slate-700 dark:text-gray-300 hover:bg-white/10"}`}
+                                className={`shrink-0 h-11 px-5 border shadow-sm ${copied ? "border-violet-600 bg-violet-600 text-white" : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50 dark:border-violet-500/30 dark:bg-violet-600 dark:text-white dark:hover:bg-violet-700"}`}
                             >
                                 {copied ? <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Copiado!</> : <><Copy className="h-4 w-4 mr-1.5" /> Copiar</>}
                             </Button>
@@ -341,7 +339,7 @@ export default function AfiliadosPage() {
                                         <Badge className="bg-violet-500/15 text-violet-400 border border-violet-500/20 text-[10px]">{mat.type}</Badge>
                                         {mat.size !== "—" && <span className="text-[10px] text-slate-400 dark:text-gray-600">{mat.size}</span>}
                                     </div>
-                                    <h4 className="text-sm font-semibold text-white mb-1">{mat.title}</h4>
+                                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{mat.title}</h4>
                                     <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{mat.desc}</p>
                                 </div>
                                 <div className="flex gap-2 mt-4">
@@ -374,11 +372,11 @@ export default function AfiliadosPage() {
                             <Input
                                 readOnly
                                 value={formLink}
-                                className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-white font-mono text-sm h-11"
+                                className="bg-white dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white font-mono text-sm h-11 shadow-sm"
                             />
                             <Button
                                 onClick={() => handleCopy(formLink, setCopiedForm)}
-                                className={`shrink-0 h-11 px-5 ${copiedForm ? "bg-violet-600 text-white" : "bg-white/[0.06] text-slate-700 dark:text-gray-300 hover:bg-white/10"}`}
+                                className={`shrink-0 h-11 px-5 border shadow-sm ${copiedForm ? "border-violet-600 bg-violet-600 text-white" : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50 dark:border-violet-500/30 dark:bg-violet-600 dark:text-white dark:hover:bg-violet-700"}`}
                             >
                                 {copiedForm ? <><CheckCircle2 className="h-4 w-4 mr-1.5" /> Copiado!</> : <><Copy className="h-4 w-4 mr-1.5" /> Copiar</>}
                             </Button>
@@ -387,7 +385,7 @@ export default function AfiliadosPage() {
 
                     {/* How it works */}
                     <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
-                        <h3 className="text-sm font-bold text-white mb-4">Como Funciona a Afiliação</h3>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Como Funciona a Afiliação</h3>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             {[
                                 { step: "1", title: "Envie o formulário", desc: "Dispare o link do formulário por e-mail, WhatsApp ou redes sociais para sua base de clientes.", icon: Send },
@@ -400,7 +398,7 @@ export default function AfiliadosPage() {
                                         <item.icon className="h-4 w-4 text-violet-400" />
                                     </div>
                                     <span className="text-[10px] text-violet-400 font-bold uppercase tracking-wider">Passo {item.step}</span>
-                                    <p className="text-sm font-semibold text-white mt-1 mb-1">{item.title}</p>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-white mt-1 mb-1">{item.title}</p>
                                     <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{item.desc}</p>
                                 </div>
                             ))}
@@ -409,7 +407,7 @@ export default function AfiliadosPage() {
 
                     {/* Quick Share Buttons */}
                     <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6">
-                        <h3 className="text-sm font-bold text-white mb-3">Compartilhar Formulário</h3>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Compartilhar Formulário</h3>
                         <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">Envie o convite diretamente por estes canais:</p>
                         <div className="flex flex-wrap gap-3">
                             <a

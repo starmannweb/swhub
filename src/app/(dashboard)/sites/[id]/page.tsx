@@ -128,6 +128,17 @@ export default function SiteDashboardPage() {
         }
     }
 
+    const handleOpenBuilder = useCallback((pageId: string) => {
+        const builderMode = window.localStorage.getItem("swhub-builder-mode")
+
+        if (builderMode === "beta") {
+            router.push(`/sites-beta?siteId=${siteId}&pageId=${pageId}`)
+            return
+        }
+
+        router.push(`/sites/${siteId}/pages/${pageId}/editor`)
+    }, [router, siteId])
+
     if (loading) {
         return (
             <div className="flex flex-1 h-[60vh] items-center justify-center">
@@ -251,7 +262,7 @@ export default function SiteDashboardPage() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardFooter className="flex justify-between border-t p-4 mt-auto">
-                                    <Button size="sm" onClick={() => router.push(`/sites/${site.id}/pages/${page.id}/editor`)}>
+                                    <Button size="sm" onClick={() => handleOpenBuilder(page.id)}>
                                         <Edit className="mr-2 h-3.5 w-3.5" /> Abrir Builder
                                     </Button>
                                     <div className="space-x-1">

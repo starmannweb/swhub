@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Users, Search, Filter, Mail, Phone, MapPin, MoreHorizontal, Loader2, LayoutGrid, AlignJustify, Linkedin, MessageSquare, Upload } from "lucide-react"
+import { Plus, Users, Search, Filter, Mail, Phone, MoreHorizontal, Loader2, LayoutGrid, AlignJustify, Linkedin, MessageSquare, Upload, FileText, Chrome } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
@@ -12,8 +12,81 @@ import Link from "next/link"
 import { ContactModal } from "@/components/modals/contact-modal"
 import { Contact } from "@/types/crm"
 
+type CsvContactRow = Record<string, string>
+
+type ContactInsert = {
+    user_id: string
+    first_name: string
+    last_name: string
+    email: string | null
+    phone: string | null
+    company: string | null
+    source: string
+    status: "active" | "inactive" | "lead" | "customer"
+}
+
+const STATUS_VALUES = ["active", "inactive", "lead", "customer"] as const
+
+function parseCsvLine(line: string, delimiter = ",") {
+    const values: string[] = []
+    let current = ""
+    let inQuotes = false
+
+    for (let index = 0; index < line.length; index += 1) {
+        const char = line[index]
+        const next = line[index + 1]
+
+        if (char === '"' && next === '"') {
+            current += '"'
+            index += 1
+            continue
+        }
+
+        if (char === '"') {
+            inQuotes = !inQuotes
+            continue
+        }
+
+        if (char === delimiter && !inQuotes) {
+            values.push(current.trim())
+            current = ""
+            continue
+        }
+
+        current += char
+    }
+
+    values.push(current.trim())
+    return values
+}
+
+function parseCsv(text: string) {
+    const lines = text.replace(/\r/g, "").split("\n").filter((line) => line.trim().length > 0)
+    if (lines.length < 2) return []
+
+    const delimiter = lines[0].includes(";") && !lines[0].includes(",") ? ";" : ","
+    const headers = parseCsvLine(lines[0], delimiter).map((header) => header.trim().toLowerCase())
+
+    return lines.slice(1).map((line) => {
+        const values = parseCsvLine(line, delimiter)
+        return headers.reduce<CsvContactRow>((row, header, index) => {
+            row[header] = values[index]?.trim() || ""
+            return row
+        }, {})
+    })
+}
+
+function getCsvValue(row: CsvContactRow, keys: string[]) {
+    for (const key of keys) {
+        const value = row[key]
+        if (value) return value
+    }
+
+    return ""
+}
+
 export default function CrmContactsPage() {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const [contacts, setContacts] = useState<Contact[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
@@ -21,15 +94,17 @@ export default function CrmContactsPage() {
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid')
     const [isImportOpen, setIsImportOpen] = useState(false)
     const [importData, setImportData] = useState({ name: "", email: "", phone: "", company: "", source: "manual" })
+    const [csvContacts, setCsvContacts] = useState<CsvContactRow[]>([])
+    const [csvFileName, setCsvFileName] = useState("")
+    const [importFeedback, setImportFeedback] = useState("")
 
-    useEffect(() => {
-        fetchContacts()
-    }, [])
-
-    async function fetchContacts() {
+    const fetchContacts = useCallback(async () => {
         setLoading(true)
         const { data: userAuth } = await supabase.auth.getUser()
-        if (!userAuth.user) return
+        if (!userAuth.user) {
+            setLoading(false)
+            return
+        }
 
         const { data, error } = await supabase
             .from('contacts')
@@ -41,7 +116,15 @@ export default function CrmContactsPage() {
             setContacts(data)
         }
         setLoading(false)
-    }
+    }, [supabase])
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => {
+            void fetchContacts()
+        }, 0)
+
+        return () => window.clearTimeout(timer)
+    }, [fetchContacts])
 
     const filteredContacts = contacts.filter(c => 
         c.first_name?.toLowerCase().includes(search.toLowerCase()) || 
@@ -63,6 +146,122 @@ export default function CrmContactsPage() {
         'lead': 'Lead',
         'customer': 'Cliente'
     }
+
+    const buildContactPayload = useCallback((data: {
+        name: string
+        email?: string
+        phone?: string
+        company?: string
+        source?: string
+        status?: string
+    }, userId: string): ContactInsert => {
+        const nameParts = data.name.trim().split(/\s+/)
+        const status = STATUS_VALUES.includes(data.status as ContactInsert["status"])
+            ? data.status as ContactInsert["status"]
+            : "lead"
+
+        return {
+            user_id: userId,
+            first_name: nameParts[0] || "",
+            last_name: nameParts.slice(1).join(" ") || "",
+            email: data.email || null,
+            phone: data.phone || null,
+            company: data.company || null,
+            source: data.source || "manual",
+            status,
+        }
+    }, [])
+
+    const handleCsvFile = useCallback((file?: File) => {
+        if (!file) return
+
+        const reader = new FileReader()
+        reader.onload = (event) => {
+            const text = String(event.target?.result || "")
+            const rows = parseCsv(text)
+            setCsvContacts(rows)
+            setCsvFileName(file.name)
+            setImportFeedback(rows.length > 0
+                ? `${rows.length} contato(s) lido(s) do CSV.`
+                : "Nao encontrei contatos validos nesse CSV.")
+        }
+        reader.readAsText(file)
+    }, [])
+
+    const handleManualImport = useCallback(async () => {
+        if (!importData.name.trim()) {
+            alert("Nome e obrigatorio")
+            return
+        }
+
+        const { data: userAuth } = await supabase.auth.getUser()
+        if (!userAuth.user) return
+
+        const { error } = await supabase.from('contacts').insert(
+            buildContactPayload(importData, userAuth.user.id)
+        )
+
+        if (!error) {
+            setIsImportOpen(false)
+            setImportData({ name: "", email: "", phone: "", company: "", source: "manual" })
+            setCsvContacts([])
+            setCsvFileName("")
+            setImportFeedback("")
+            void fetchContacts()
+        } else {
+            alert("Erro ao importar contato")
+        }
+    }, [buildContactPayload, fetchContacts, importData, supabase])
+
+    const handleCsvImport = useCallback(async () => {
+        if (csvContacts.length === 0) {
+            alert("Selecione um CSV com contatos antes de importar.")
+            return
+        }
+
+        const { data: userAuth } = await supabase.auth.getUser()
+        if (!userAuth.user) return
+
+        const payload = csvContacts
+            .map((row) => {
+                const firstName = getCsvValue(row, ["first_name", "primeiro_nome"])
+                const lastName = getCsvValue(row, ["last_name", "sobrenome"])
+                const name = getCsvValue(row, ["name", "nome", "full_name", "nome completo", "nome_completo"]) || `${firstName} ${lastName}`.trim()
+
+                return buildContactPayload({
+                    name,
+                    email: getCsvValue(row, ["email", "e-mail", "mail"]),
+                    phone: getCsvValue(row, ["phone", "telefone", "whatsapp", "celular"]),
+                    company: getCsvValue(row, ["company", "empresa", "organizacao", "organization"]),
+                    source: getCsvValue(row, ["source", "origem"]) || "csv",
+                    status: getCsvValue(row, ["status", "situacao"]) || "lead",
+                }, userAuth.user.id)
+            })
+            .filter((contact) => contact.first_name)
+
+        if (payload.length === 0) {
+            alert("O CSV precisa ter ao menos uma coluna de nome/name ou first_name.")
+            return
+        }
+
+        const { error } = await supabase.from('contacts').insert(payload)
+
+        if (!error) {
+            setIsImportOpen(false)
+            setCsvContacts([])
+            setCsvFileName("")
+            setImportFeedback("")
+            void fetchContacts()
+        } else {
+            alert("Erro ao importar CSV")
+        }
+    }, [buildContactPayload, csvContacts, fetchContacts, supabase])
+
+    const handleExtensionInstall = useCallback((source: "linkedin" | "whatsapp") => {
+        const label = source === "linkedin" ? "LinkedIn" : "WhatsApp"
+        setImportData((current) => ({ ...current, source }))
+        setImportFeedback(`Extensao ${label}: deixe o pacote da extensao publicado e configure o token de captura para liberar a instalacao real.`)
+    }, [])
 
     return (
         <div className="space-y-6">
@@ -254,14 +453,83 @@ export default function CrmContactsPage() {
             />
 
             <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
-                <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/10">
+                <DialogContent className="sm:max-w-[720px] bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/10">
                     <DialogHeader>
                         <DialogTitle className="text-slate-900 dark:text-white">Importar Contatos</DialogTitle>
                         <DialogDescription className="text-slate-500 dark:text-gray-400">
-                            Importe contatos rapidamente do LinkedIn ou WhatsApp para o CRM.
+                            Importe por CSV, cadastre um contato manualmente ou conecte as extensoes de captura.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+                    <div className="space-y-5 py-4">
+                        {importFeedback && (
+                            <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300">
+                                {importFeedback}
+                            </div>
+                        )}
+
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-[#0d0f1a]">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-start gap-3">
+                                    <div className="rounded-lg bg-violet-100 p-2 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300">
+                                        <FileText className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Importar CSV</p>
+                                        <p className="text-xs text-slate-500 dark:text-gray-400">Aceita colunas como nome/name, email, telefone/phone, empresa/company, origem/source e status.</p>
+                                        {csvFileName && (
+                                            <p className="mt-1 text-[11px] font-medium text-violet-600 dark:text-violet-300">{csvFileName}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <label className="inline-flex h-9 cursor-pointer items-center rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-white/10 dark:bg-[#12142a] dark:text-gray-200 dark:hover:bg-white/[0.04]">
+                                    Selecionar CSV
+                                    <input
+                                        type="file"
+                                        accept=".csv,text/csv"
+                                        className="hidden"
+                                        onChange={(event) => {
+                                            handleCsvFile(event.target.files?.[0])
+                                            event.target.value = ""
+                                        }}
+                                    />
+                                </label>
+                            </div>
+                            <Button
+                                type="button"
+                                onClick={handleCsvImport}
+                                disabled={csvContacts.length === 0}
+                                className="mt-4 w-full bg-violet-600 text-white hover:bg-violet-700"
+                            >
+                                <Upload className="mr-2 h-4 w-4" /> Importar {csvContacts.length > 0 ? `${csvContacts.length} contato(s)` : "CSV"}
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {[
+                                { key: "linkedin" as const, label: "Extensao LinkedIn", icon: Linkedin, color: "blue" },
+                                { key: "whatsapp" as const, label: "Extensao WhatsApp", icon: MessageSquare, color: "green" },
+                            ].map((item) => (
+                                <div key={item.key} className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`rounded-lg p-2 ${item.color === "blue" ? "bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300" : "bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-300"}`}>
+                                            <item.icon className="h-4 w-4" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.label}</p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">Captura contatos da tela e envia para o CRM com origem marcada.</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => handleExtensionInstall(item.key)}
+                                        className="mt-4 w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-200 dark:hover:bg-white/[0.06]"
+                                    >
+                                        <Chrome className="mr-2 h-4 w-4" /> Instalar extensao
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => setImportData({...importData, source: "linkedin"})}
@@ -303,29 +571,7 @@ export default function CrmContactsPage() {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsImportOpen(false)} className="border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-300">Cancelar</Button>
                         <Button 
-                            onClick={async () => {
-                                if (!importData.name) { alert("Nome é obrigatório"); return }
-                                const { data: userAuth } = await supabase.auth.getUser()
-                                if (!userAuth.user) return
-                                const nameParts = importData.name.split(" ")
-                                const { error } = await supabase.from('contacts').insert({
-                                    user_id: userAuth.user.id,
-                                    first_name: nameParts[0] || "",
-                                    last_name: nameParts.slice(1).join(" ") || "",
-                                    email: importData.email || null,
-                                    phone: importData.phone || null,
-                                    company: importData.company || null,
-                                    source: importData.source,
-                                    status: 'lead'
-                                })
-                                if (!error) {
-                                    setIsImportOpen(false)
-                                    setImportData({ name: "", email: "", phone: "", company: "", source: "manual" })
-                                    fetchContacts()
-                                } else {
-                                    alert("Erro ao importar contato")
-                                }
-                            }}
+                            onClick={handleManualImport}
                             className={importData.source === 'linkedin' ? 'bg-blue-600 hover:bg-blue-700 text-white' : importData.source === 'whatsapp' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-violet-600 hover:bg-violet-700 text-white'}
                         >
                             <Upload className="mr-2 h-4 w-4" /> Importar Contato

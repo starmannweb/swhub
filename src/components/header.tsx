@@ -25,6 +25,11 @@ interface HeaderProps {
     userName?: string
 }
 
+type ProfileRecord = {
+    full_name?: string | null
+    phone?: string | null
+}
+
 export function Header({ userEmail, userName }: HeaderProps) {
     const router = useRouter()
     const supabase = createClient()
@@ -56,18 +61,20 @@ export function Header({ userEmail, userName }: HeaderProps) {
             if (user) {
                 const { data, error } = await profileClient
                     .from("profiles")
-                    .select("full_name, phone")
+                    .select("*")
                     .eq("id", user.id)
                     .single()
 
                 if (error && error.code !== "PGRST116") {
-                    setProfileError("Não foi possível carregar seus dados agora.")
+                    console.warn("Nao foi possivel carregar o perfil completo:", error.message)
                 }
 
+                const profileData = (data || {}) as ProfileRecord
+
                 setProfile({
-                    full_name: data?.full_name || user.user_metadata?.full_name || userName || "",
+                    full_name: profileData.full_name || user.user_metadata?.full_name || userName || "",
                     email: user.email || userEmail || "",
-                    phone: data?.phone || "",
+                    phone: profileData.phone || user.user_metadata?.phone || "",
                 })
             }
             setLoadingProfile(false)
@@ -87,6 +94,19 @@ export function Header({ userEmail, userName }: HeaderProps) {
             return
         }
 
+        const { error: authError } = await supabase.auth.updateUser({
+            data: {
+                full_name: profile.full_name,
+                phone: profile.phone,
+            },
+        })
+
+        if (authError) {
+            setProfileError(authError.message || "Nao foi possivel salvar seus dados.")
+            setSavingProfile(false)
+            return
+        }
+
         const { error } = await supabase
             .from("profiles")
             .update({
@@ -96,12 +116,16 @@ export function Header({ userEmail, userName }: HeaderProps) {
             .eq("id", user.id)
 
         if (error) {
-            setProfileError(error.message || "Não foi possível salvar seus dados.")
-            setSavingProfile(false)
-            return
+            const { error: fallbackError } = await supabase
+                .from("profiles")
+                .update({ full_name: profile.full_name })
+                .eq("id", user.id)
+
+            if (fallbackError) {
+                console.warn("Perfil salvo no auth, mas nao na tabela profiles:", fallbackError.message)
+            }
         }
 
-        await supabase.auth.updateUser({ data: { full_name: profile.full_name } })
         setSavingProfile(false)
         setProfileOpen(false)
         router.refresh()

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
-    Settings, Plus, Trash2, Loader2, Save, KanbanSquare, ShieldCheck, LayoutTemplate, Download, ArrowRight, Bot, Share2, CreditCard, CheckCircle2, Clock, PlugZap
+    Settings, Plus, Trash2, Loader2, Save, KanbanSquare, ShieldCheck, LayoutTemplate, Download, ArrowRight, Bot, Share2, CreditCard, CheckCircle2, Clock, PlugZap, UserCog, Users
 } from "lucide-react"
 import Link from "next/link"
 
@@ -18,9 +18,27 @@ type PipelineStage = {
     color: string
 }
 
-type ConfigTab = "geral" | "pipeline" | "integracoes" | "financeiro" | "admin"
+type ConfigTab = "geral" | "pipeline" | "integracoes" | "financeiro" | "equipe" | "admin"
 
-const CONFIG_TABS: ConfigTab[] = ["geral", "pipeline", "integracoes", "financeiro", "admin"]
+const CONFIG_TABS: ConfigTab[] = ["geral", "pipeline", "integracoes", "financeiro", "equipe", "admin"]
+
+type TeamRole = "admin" | "manager" | "sales" | "support"
+
+type TeamMember = {
+    id: string
+    full_name: string | null
+    email?: string | null
+    role: string | null
+    is_admin?: boolean | null
+    created_at?: string | null
+}
+
+const TEAM_ROLES: { value: TeamRole; label: string; description: string }[] = [
+    { value: "admin", label: "Administrador", description: "Acesso total a admin, dados e configuracoes." },
+    { value: "manager", label: "Gestor", description: "Gerencia operacao, CRM e relatorios." },
+    { value: "sales", label: "Comercial", description: "Opera leads, negocios e propostas." },
+    { value: "support", label: "Suporte", description: "Atende clientes e acompanha materiais." },
+]
 
 const STAGE_COLORS = [
     { value: "gray", label: "Cinza", bg: "bg-gray-400" },
@@ -49,6 +67,10 @@ export default function ConfiguracoesPage() {
     const [stages, setStages] = useState<PipelineStage[]>([])
     const [tab, setTab] = useState<ConfigTab>(() => isConfigTab(tabParam) ? tabParam : "geral")
     const [isAdmin, setIsAdmin] = useState(false)
+    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+    const [teamLoading, setTeamLoading] = useState(false)
+    const [teamFeedback, setTeamFeedback] = useState("")
+    const [newMember, setNewMember] = useState({ name: "", email: "", role: "sales" as TeamRole })
 
     const handleTabChange = useCallback((nextTab: ConfigTab) => {
         setTab(nextTab)
@@ -91,13 +113,38 @@ export default function ConfiguracoesPage() {
         setLoading(false)
     }, [supabase])
 
+    const fetchTeamMembers = useCallback(async () => {
+        setTeamLoading(true)
+        try {
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("id, full_name, email, role, is_admin, created_at")
+                .order("created_at", { ascending: false })
+
+            if (!error) {
+                setTeamMembers((data || []) as TeamMember[])
+                return
+            }
+
+            const { data: fallbackData } = await supabase
+                .from("profiles")
+                .select("id, full_name, role, is_admin, created_at")
+                .order("created_at", { ascending: false })
+
+            setTeamMembers((fallbackData || []) as TeamMember[])
+        } finally {
+            setTeamLoading(false)
+        }
+    }, [supabase])
+
     useEffect(() => {
         const timer = window.setTimeout(() => {
             void fetchPipeline()
+            void fetchTeamMembers()
         }, 0)
 
         return () => window.clearTimeout(timer)
-    }, [fetchPipeline])
+    }, [fetchPipeline, fetchTeamMembers])
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -190,6 +237,37 @@ export default function ConfiguracoesPage() {
         alert("Pipeline salvo com sucesso!")
     }
 
+    async function handleTeamRoleChange(memberId: string, role: TeamRole) {
+        setTeamFeedback("")
+        const { error } = await supabase
+            .from("profiles")
+            .update({ role, is_admin: role === "admin" })
+            .eq("id", memberId)
+
+        if (error) {
+            setTeamFeedback("Nao foi possivel alterar o nivel desse usuario.")
+            return
+        }
+
+        setTeamFeedback("Nivel atualizado com sucesso.")
+        void fetchTeamMembers()
+    }
+
+    function handleInviteMember(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        if (!newMember.email.trim()) {
+            setTeamFeedback("Informe o e-mail do usuario.")
+            return
+        }
+
+        const roleLabel = TEAM_ROLES.find((role) => role.value === newMember.role)?.label || "Comercial"
+        const subject = "Convite para acessar o SWHub"
+        const body = `Ola${newMember.name ? ` ${newMember.name}` : ""},\n\nVoce foi convidado para acessar o SWHub com nivel ${roleLabel}.\n\nAcesse a plataforma e finalize seu cadastro.`
+
+        window.location.href = `mailto:${newMember.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        setTeamFeedback("Convite preparado no seu cliente de e-mail.")
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -235,6 +313,14 @@ export default function ConfiguracoesPage() {
                     }`}
                 >
                     <CreditCard className="h-3.5 w-3.5" /> Situação Financeira
+                </button>
+                <button
+                    onClick={() => handleTabChange("equipe")}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+                        tab === "equipe" ? "bg-white dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 shadow-sm" : "text-slate-500 hover:text-slate-900 dark:text-gray-500 dark:hover:text-gray-300"
+                    }`}
+                >
+                    <UserCog className="h-3.5 w-3.5" /> Equipe & Acessos
                 </button>
                 {isAdmin && (
                     <button
@@ -394,6 +480,127 @@ export default function ConfiguracoesPage() {
                                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                     Salvar Integração Meta
                                 </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Equipe Tab */}
+            {tab === "equipe" && (
+                <div className="space-y-6 w-full">
+                    {teamFeedback && (
+                        <div className="rounded-lg border border-violet-200 bg-violet-50 px-4 py-3 text-xs text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300">
+                            {teamFeedback}
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 shadow-sm">
+                            <div className="flex items-center justify-between gap-4 mb-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-violet-500/10 text-violet-500 flex items-center justify-center">
+                                        <Users className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-bold text-slate-900 dark:text-white">Usuarios e niveis</h2>
+                                        <p className="text-xs text-slate-500 dark:text-gray-400">Gerencie quem administra a empresa dentro da plataforma.</p>
+                                    </div>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => void fetchTeamMembers()}>
+                                    Atualizar
+                                </Button>
+                            </div>
+
+                            {teamLoading ? (
+                                <div className="flex justify-center py-10">
+                                    <Loader2 className="h-5 w-5 animate-spin text-violet-500" />
+                                </div>
+                            ) : teamMembers.length === 0 ? (
+                                <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center dark:border-white/10">
+                                    <Users className="h-8 w-8 text-slate-300 dark:text-gray-700 mx-auto mb-2" />
+                                    <p className="text-sm font-semibold text-slate-700 dark:text-gray-300">Nenhum usuario listado</p>
+                                    <p className="text-xs text-slate-500 dark:text-gray-500 mt-1">Verifique as politicas da tabela profiles para liberar a leitura.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    {teamMembers.map((member) => (
+                                        <div key={member.id} className="flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/[0.06] dark:bg-[#0d0f1a]">
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{member.full_name || member.email || "Usuario sem nome"}</p>
+                                                <p className="text-xs text-slate-500 dark:text-gray-500 truncate">{member.email || member.id}</p>
+                                            </div>
+                                            <select
+                                                value={(member.is_admin ? "admin" : member.role || "sales") as TeamRole}
+                                                onChange={(event) => void handleTeamRoleChange(member.id, event.target.value as TeamRole)}
+                                                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 outline-none focus:border-violet-400 dark:border-white/10 dark:bg-[#12142a] dark:text-gray-200"
+                                                disabled={!isAdmin}
+                                            >
+                                                {TEAM_ROLES.map((role) => (
+                                                    <option key={role.value} value={role.value}>{role.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 shadow-sm">
+                            <div className="flex items-center gap-3 mb-5">
+                                <div className="h-10 w-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                                    <UserCog className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">Convidar usuario</h2>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400">Prepare o convite com o nivel de acesso.</p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleInviteMember} className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Nome</label>
+                                    <Input
+                                        value={newMember.name}
+                                        onChange={(event) => setNewMember({ ...newMember, name: event.target.value })}
+                                        placeholder="Nome completo"
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06]"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">E-mail</label>
+                                    <Input
+                                        type="email"
+                                        value={newMember.email}
+                                        onChange={(event) => setNewMember({ ...newMember, email: event.target.value })}
+                                        placeholder="usuario@empresa.com"
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06]"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Nivel</label>
+                                    <select
+                                        value={newMember.role}
+                                        onChange={(event) => setNewMember({ ...newMember, role: event.target.value as TeamRole })}
+                                        className="h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:border-violet-400 dark:border-white/[0.06] dark:bg-[#0d0f1a] dark:text-white"
+                                    >
+                                        {TEAM_ROLES.map((role) => (
+                                            <option key={role.value} value={role.value}>{role.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+                                    Gerar Convite
+                                </Button>
+                            </form>
+
+                            <div className="mt-5 space-y-2">
+                                {TEAM_ROLES.map((role) => (
+                                    <div key={role.value} className="rounded-lg bg-slate-50 p-3 dark:bg-[#0d0f1a]">
+                                        <p className="text-xs font-semibold text-slate-900 dark:text-white">{role.label}</p>
+                                        <p className="text-[11px] text-slate-500 dark:text-gray-500 mt-0.5">{role.description}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
