@@ -180,15 +180,16 @@ export default async function DashboardPage() {
                         <Link
                             key={mod.title}
                             href={mod.href}
-                            className="group rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] overflow-hidden hover:border-violet-300 dark:hover:border-violet-500/30 transition-all duration-200 hover:shadow-lg hover:shadow-violet-900/10 shadow-sm"
+                            className="group flex items-start gap-4 p-5 rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] hover:border-violet-500/20 transition-all"
                         >
-                            <div className={`h-24 bg-gradient-to-br ${mod.color} flex items-center justify-center`}>
-                                <mod.icon className="h-10 w-10 text-white/80 group-hover:scale-110 transition-transform duration-200" />
+                            <div className={`p-2.5 rounded-xl shrink-0 ${mod.iconBg}`}>
+                                <mod.icon className="h-5 w-5" />
                             </div>
-                            <div className="p-4">
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{mod.title}</h3>
-                                <p className="text-xs text-slate-500 dark:text-gray-500 leading-relaxed">{mod.description}</p>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{mod.title}</p>
+                                <p className="text-[11px] text-slate-500 dark:text-gray-500 leading-relaxed">{mod.description}</p>
                             </div>
+                            <ArrowRight className="h-4 w-4 text-slate-300 dark:text-gray-700 group-hover:text-violet-400 transition-colors shrink-0 mt-1" />
                         </Link>
                     ))}
                 </div>
