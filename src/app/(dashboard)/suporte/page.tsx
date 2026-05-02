@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Headset, Mail, FileQuestion } from "lucide-react"
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -64,9 +65,9 @@ export default function SuportePage() {
                     <p className="text-xs text-slate-500 dark:text-gray-500 mb-4">
                         Consulte tutoriais, FAQs e guias de uso da plataforma.
                     </p>
-                    <button className="w-full px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium transition-colors">
+                    <Link href="/suporte/faq" className="block w-full px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium transition-colors text-center">
                         Acessar FAQ
-                    </button>
+                    </Link>
                 </div>
             </div>
 

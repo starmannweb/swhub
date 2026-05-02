@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
-    Settings, Plus, Trash2, Loader2, Save, KanbanSquare, ShieldCheck, LayoutTemplate, Download, ArrowRight, Bot, Share2, CreditCard, CheckCircle2, Clock, PlugZap, UserCog, Users
+    Settings, Plus, Trash2, Loader2, Save, KanbanSquare, ShieldCheck, LayoutTemplate, Download, ArrowRight, Bot, Share2, CreditCard, CheckCircle2, Clock, PlugZap, UserCog, Users, Mail
 } from "lucide-react"
 import Link from "next/link"
 
@@ -380,6 +380,7 @@ export default function ConfiguracoesPage() {
                                 <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">Este espaço fica reservado para assinatura, faturas, pagamentos e gateway da própria plataforma.</p>
                             </div>
                         </div>
+
                     </div>
                 </div>
             )}
@@ -398,10 +399,11 @@ export default function ConfiguracoesPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                             {[
                                 { name: "OpenAI", desc: "Geração de sites e automações com IA", status: "Configurar" },
                                 { name: "Meta Ads", desc: "Leads, pixel e API de conversões", status: "Configurar" },
+                                { name: "Resend", desc: "E-mails transacionais e suporte", status: "Configurar" },
                                 { name: "WhatsApp", desc: "Disparos e atendimento conectado", status: "Em breve" },
                             ].map((item) => (
                                 <div key={item.name} className="rounded-lg border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-[#0d0f1a] p-4">
@@ -423,7 +425,7 @@ export default function ConfiguracoesPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {/* IA Integration */}
                         <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
                             <div className="flex items-center gap-3">
@@ -479,6 +481,38 @@ export default function ConfiguracoesPage() {
                                 </div>
                                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                     Salvar Integração Meta
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl bg-white dark:bg-[#12142a] border border-slate-200 dark:border-white/[0.06] p-6 space-y-5 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-lg bg-emerald-500/10">
+                                    <Mail className="h-6 w-6 text-emerald-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">Resend</h2>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400">Envios transacionais e solicitacoes de suporte.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">RESEND_API_KEY</label>
+                                    <Input
+                                        type="password"
+                                        placeholder="re_..."
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-slate-500 dark:text-gray-400">Remetente padrao</label>
+                                    <Input
+                                        placeholder="SWHub <suporte@seudominio.com>"
+                                        className="bg-slate-50 dark:bg-[#0d0f1a] border-slate-200 dark:border-white/[0.06] text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                                    Salvar Integracao Resend
                                 </Button>
                             </div>
                         </div>
