@@ -42,8 +42,8 @@ export default function LoginPage() {
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted px-4">
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1 text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-                        <span className="text-xl font-bold text-primary-foreground">H</span>
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+                        <img src="/sw-hub-logo.webp" alt="SWHub Logo" className="h-full w-full object-contain" />
                     </div>
                     <CardTitle className="text-2xl font-bold">Entrar no SWHub</CardTitle>
                     <CardDescription>

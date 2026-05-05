@@ -136,8 +136,8 @@ export function Sidebar({ isAdmin = false }: { isAdmin?: boolean }) {
             {/* Header - Logo & Toggle */}
             <div className="flex shrink-0 items-center justify-between px-4 py-5 sticky top-0 bg-white dark:bg-[#0d0f1a] z-10">
                 <div className={cn("flex items-center gap-3 overflow-hidden", isCollapsed && "w-0 opacity-0")}>
-                    <div className="flex shrink-0 h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 shadow-lg shadow-violet-900/30">
-                        <span className="text-sm font-bold text-white">S</span>
+                    <div className="flex shrink-0 h-10 w-10 items-center justify-center">
+                        <img src="/sw-hub-logo.webp" alt="SWHub Logo" className="h-full w-full object-contain" />
                     </div>
                     <div className="min-w-0">
                         <p className="text-sm font-bold text-slate-900 dark:text-white truncate tracking-wide">SWHub</p>
